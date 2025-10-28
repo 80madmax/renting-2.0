@@ -1,0 +1,55 @@
+﻿@model BO.ViewModels.DistrictViewModel
+
+@{
+    ViewData["Title"] = "Create District";
+}
+
+<h1>Create District</h1>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SelectedCountryId"></label>
+        <select asp-for="SelectedCountryId" asp-items="Model.Countries" class="form-control" id="CountrySelect">
+            <option value="">-- Select a country --</option>
+        </select>
+        <span asp-validation-for="SelectedCountryId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CityId"></label>
+        <select asp-for="CityId" asp-items="Model.Cities" class="form-control" id="CitySelect">
+            <option value="">-- Select a city --</option>
+        </select>
+        <span asp-validation-for="CityId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $('#CountrySelect').on('change', function () {
+            var countryId = $(this).val();
+            $('#CitySelect').empty().append('<option value="">-- Loading cities --</option>');
+
+            if (countryId) {
+                $.getJSON('@Url.Action("GetCitiesByCountry", "District")', { countryId: countryId }, function (data) {
+                    $('#CitySelect').empty().append('<option value="">-- Select a city --</option>');
+                    $.each(data, function (index, item) {
+                        $('#CitySelect').append('<option value="' + item.value + '">' + item.text + '</option>');
+                    });
+                });
+            } else {
+                $('#CitySelect').empty().append('<option value="">-- Select a city --</option>');
+            }
+        });
+    </script>
+}

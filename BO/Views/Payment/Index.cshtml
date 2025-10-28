@@ -1,0 +1,65 @@
+﻿@model BO.ViewModels.PaymentListViewModel
+
+@{
+    ViewData["Title"] = "Payments";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Payment</a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.Payments[0].Id)</th>
+            <th>@Html.DisplayNameFor(m => m.Payments[0].Name)</th>
+            <th>@Html.DisplayNameFor(m => m.Payments[0].PaymentTypeName)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var payment in Model.Payments)
+        {
+            <tr>
+                <td>@payment.Id</td>
+                <td>@payment.Name</td>
+                <td>@payment.PaymentTypeName</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@payment.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Details" asp-route-id="@payment.Id" class="btn btn-info btn-sm">Details</a>
+                    <button type="button"
+                            class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            data-entity-id="@payment.Id"
+                            data-entity-value="@payment.Name">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="mt-3">
+    @if (Model.HasPreviousPage)
+    {
+        <a asp-action="Index" asp-route-pageNumber="@(Model.PageIndex - 1)" class="btn btn-outline-primary">Previous</a>
+    }
+    Page @Model.PageIndex of @Model.TotalPages
+    @if (Model.HasNextPage)
+    {
+        <a asp-action="Index" asp-route-pageNumber="@(Model.PageIndex + 1)" class="btn btn-outline-primary">Next</a>
+    }
+</div>
+
+<!-- Include reusable delete modal -->
+@await Html.PartialAsync("_DeleteModal", new BO.ViewModels.DeleteModalViewModel
+{
+    EntityName = "Payment",
+    EntityValue = "",
+    EntityId = 0,
+    ActionUrl = Url.Action("Delete", "Payment")
+})

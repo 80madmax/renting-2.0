@@ -1,0 +1,13 @@
+﻿namespace BO.ViewModels
+{
+    public class TransactionViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string UnitName { get; set; }
+        public string PaymentName { get; set; }
+        public decimal Amount { get; set; }
+        public int Month { get; set; }
+        public int Year { get; set; }
+    }
+}

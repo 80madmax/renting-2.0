@@ -1,0 +1,37 @@
+﻿@model BO.ViewModels.PaymentViewModel
+
+@{
+    ViewData["Title"] = "Create Payment";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <label asp-for="PaymentTypeId" class="control-label"></label>
+                <select asp-for="PaymentTypeId" asp-items="Model.PaymentTypes" class="form-control">
+                    <option value="">-- Select Payment Types --</option>
+                </select>
+                <span asp-validation-for="PaymentTypeId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
+

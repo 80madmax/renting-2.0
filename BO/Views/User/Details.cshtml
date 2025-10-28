@@ -1,0 +1,50 @@
+﻿@model BO.ViewModels.UserCreateViewModel
+@using BO.ViewModels
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+<h1>User Details</h1>
+
+<div>
+    <h4>@Model.Name</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">ID</dt>
+        <dd class="col-sm-10">@Model.Id</dd>
+
+        <dt class="col-sm-2">Name</dt>
+        <dd class="col-sm-10">@Model.Name</dd>
+
+        <dt class="col-sm-2">Role</dt>
+        <dd class="col-sm-10">@Model.RoleName</dd>
+
+        <dt class="col-sm-2">Email</dt>
+        <dd class="col-sm-10">@Model.Email</dd>
+
+        <dt class="col-sm-2">Phone</dt>
+        <dd class="col-sm-10">@Model.Phone</dd>
+
+        <dt class="col-sm-2">Is Active</dt>
+        <dd class="col-sm-10"><input type="checkbox" disabled @(Model.IsActive ? "checked" : "") /></dd>
+    </dl>
+</div>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+<button type="button"
+        class="btn btn-danger"
+        data-bs-toggle="modal"
+        data-bs-target="#deleteModal"
+        data-entity-id="@Model.Id"
+        data-entity-value="@Model.Name">
+    Delete
+</button>
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>
+@await Html.PartialAsync("_DeleteModal", new DeleteModalViewModel
+{
+    EntityName = "User",
+    EntityValue = "", // placeholder; JS sets it dynamically
+    EntityId = 0,     // placeholder; JS sets it dynamically
+    ActionUrl = Url.Action("Delete", "User")
+})

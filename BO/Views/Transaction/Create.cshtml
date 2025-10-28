@@ -1,0 +1,64 @@
+﻿@model BO.ViewModels.TransactionCreateViewModel
+
+@{
+    ViewData["Title"] = "Create Transaction";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="SelectedUnitIds"></label>
+        <select asp-for="SelectedUnitIds"
+                asp-items="Model.Units"
+                class="form-control select2"
+                multiple="multiple"
+                style="width: 100%;">
+        </select>
+        <span asp-validation-for="SelectedUnitIds" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PaymentId"></label>
+        <select asp-for="PaymentId" asp-items="Model.Payments" class="form-control"></select>
+        <span asp-validation-for="PaymentId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Year"></label>
+        <select asp-for="Year" asp-items="Model.Years" class="form-control"></select>
+        <span asp-validation-for="Year" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Month"></label>
+        <select asp-for="Month" asp-items="Model.Months" class="form-control"></select>
+        <span asp-validation-for="Month" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Amount"></label>
+        <input asp-for="Amount" class="form-control" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Note"></label>
+        <input asp-for="Note" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Create</button>
+    <a asp-action="Index" class="btn btn-secondary mt-2">Back to List</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: "Select units",
+                allowClear: true
+            });
+        });
+    </script>
+}

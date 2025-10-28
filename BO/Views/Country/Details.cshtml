@@ -1,0 +1,35 @@
+﻿@model BO.ViewModels.CountryViewModel
+@using BO.ViewModels
+
+<h2>Country Details</h2>
+
+<div>
+    <h4>@Model.Name</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">ID</dt>
+        <dd class="col-sm-10">@Model.Id</dd>
+
+        <dt class="col-sm-2">Name</dt>
+        <dd class="col-sm-10">@Model.Name</dd>
+    </dl>
+</div>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+<button type="button"
+        class="btn btn-danger"
+        data-bs-toggle="modal"
+        data-bs-target="#deleteModal"
+        data-entity-id="@Model.Id"
+        data-entity-value="@Model.Name">
+    Delete
+</button>
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>
+
+@await Html.PartialAsync("_DeleteModal", new DeleteModalViewModel
+{
+    EntityName = "Country",
+    EntityValue = "", // placeholder; JS sets it dynamically
+    EntityId = 0,     // placeholder; JS sets it dynamically
+    ActionUrl = Url.Action("Delete", "Country")
+})

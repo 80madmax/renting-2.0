@@ -1,0 +1,68 @@
+﻿@using BO.ViewModels
+@model DistrictListViewModel
+
+
+@{
+    ViewData["Title"] = "Districts";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New District</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => Model.Districts[0].Id)</th>
+            <th>@Html.DisplayNameFor(model => Model.Districts[0].Name)</th>
+            <th>@Html.DisplayNameFor(model => Model.Districts[0].CityName)</th>
+            <th>@Html.DisplayNameFor(model => Model.Districts[0].CountryName)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var country in Model.Districts)
+        {
+            <tr>
+                <td>@country.Id</td>
+                <td>@country.Name</td>
+                <td>@country.CityName</td>
+                <td>@country.CountryName</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@country.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Details" asp-route-id="@country.Id" class="btn btn-info btn-sm">Details</a>
+                    <button type="button"
+                            class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            data-entity-id="@country.Id"
+                            data-entity-value="@country.Name">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    @if (Model.HasPreviousPage)
+    {
+        <a asp-action="Index" asp-route-pageNumber="@(Model.PageIndex - 1)" class="btn btn-outline-primary">Previous</a>
+    }
+    Page @Model.PageIndex of @Model.TotalPages
+    @if (Model.HasNextPage)
+    {
+        <a asp-action="Index" asp-route-pageNumber="@(Model.PageIndex + 1)" class="btn btn-outline-primary">Next</a>
+    }
+</div>
+
+@await Html.PartialAsync("_DeleteModal", new DeleteModalViewModel
+{
+    EntityName = "District",
+    EntityValue = "", // placeholder; JS sets it dynamically
+    EntityId = 0,     // placeholder; JS sets it dynamically
+    ActionUrl = Url.Action("Delete", "District")
+})
