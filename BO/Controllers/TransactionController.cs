@@ -122,7 +122,7 @@ namespace BO.Controllers
             {
                 Filter = new TransactionFilterViewModel
                 {
-                    SelectedUnitIds = selectedUnitIds,
+                    SelectedUnitId = selectedUnitId,
                     SelectedMonth = selectedMonth ?? DateTime.Now.Month,
                     SelectedYear = selectedYear ?? DateTime.Now.Year,
                     SelectedPaymentId = selectedPaymentId,
@@ -130,7 +130,7 @@ namespace BO.Controllers
                     {
                         Value = u.Id.ToString(),
                         Text = u.Name,
-                        Selected = selectedUnitIds.Contains(u.Id)
+                        Selected = (u.Id == selectedUnitId)
                     }),
                     Months = Enumerable.Range(1, 12).Select(m => new SelectListItem
                     {
