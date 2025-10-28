@@ -1,0 +1,89 @@
+﻿@model BO.ViewModels.TransactionListViewModel
+
+@{
+    ViewData["Title"] = "Transactions";
+}
+
+<h2>Transactions</h2>
+
+<form method="get" asp-action="Index" class="mb-3">
+    <div class="row">
+        <div class="col-md-3">
+            <label>Unit</label>
+            <select asp-for="Filter.SelectedUnitId" asp-items="Model.Filter.Units" class="form-control">
+                <option value="">-- All Units --</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Month</label>
+            <select asp-for="Filter.SelectedMonth" asp-items="Model.Filter.Months" class="form-control">
+                <option value="">-- All Months --</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Year</label>
+            <select asp-for="Filter.SelectedYear" asp-items="Model.Filter.Years" class="form-control">
+                <option value="">-- All Years --</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label>Payment</label>
+            <select asp-for="Filter.SelectedPaymentId" asp-items="Model.Filter.Payments" class="form-control">
+                <option value="">-- All Payments --</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Unit</th>
+            <th>Payment</th>
+            <th>Month</th>
+            <th>Year</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model.Transactions)
+        {
+            <tr>
+                <td>@t.UnitName</td>
+                <td>@t.PaymentName</td>
+                <td>@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(t.Month)</td>
+                <td>@t.Year</td>
+                <td>@t.Amount.ToString("N2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    @if (Model.HasPreviousPage)
+    {
+        <a asp-action="Index"
+           asp-route-pageNumber="@(Model.PageIndex - 1)"
+           asp-route-selectedUnitId="@Model.Filter.SelectedUnitId"
+           asp-route-selectedMonth="@Model.Filter.SelectedMonth"
+           asp-route-selectedYear="@Model.Filter.SelectedYear"
+           asp-route-selectedPaymentId="@Model.Filter.SelectedPaymentId"
+           class="btn btn-outline-primary">Previous</a>
+    }
+
+    Page @Model.PageIndex of @Model.TotalPages
+
+    @if (Model.HasNextPage)
+    {
+        <a asp-action="Index"
+           asp-route-pageNumber="@(Model.PageIndex + 1)"
+           asp-route-selectedUnitId="@Model.Filter.SelectedUnitId"
+           asp-route-selectedMonth="@Model.Filter.SelectedMonth"
+           asp-route-selectedYear="@Model.Filter.SelectedYear"
+           asp-route-selectedPaymentId="@Model.Filter.SelectedPaymentId"
+           class="btn btn-outline-primary">Next</a>
+    }
+</div>
