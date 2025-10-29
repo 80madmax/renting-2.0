@@ -1,12 +1,18 @@
-﻿@model BO.ViewModels.TransactionListViewModel
+﻿@using BO.ViewModels
+@model TransactionListViewModel
 
 @{
     ViewData["Title"] = "Transactions";
 }
 
-<h2>$ViewData["Title"]</h2>
+<h1>@ViewData["Title"]</h1>
 
-<form method="get" asp-action="Index" class="mb-3">
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Transaction</a>
+</p>
+
+<!-- Filter form -->
+<form method="get" asp-action="Index" class="mb-4">
     <div class="row">
         <div class="col-md-3">
             <label>Unit</label>
@@ -38,14 +44,16 @@
     </div>
 </form>
 
-<table class="table table-bordered">
+<!-- Transactions table -->
+<table class="table">
     <thead>
         <tr>
-            <th>Unit</th>
-            <th>Payment</th>
-            <th>Month</th>
-            <th>Year</th>
-            <th>Amount</th>
+            <th>@Html.DisplayNameFor(model => Model.Transactions[0].UnitName)</th>
+            <th>@Html.DisplayNameFor(model => Model.Transactions[0].PaymentName)</th>
+            <th>@Html.DisplayNameFor(model => Model.Transactions[0].Month)</th>
+            <th>@Html.DisplayNameFor(model => Model.Transactions[0].Year)</th>
+            <th>@Html.DisplayNameFor(model => Model.Transactions[0].Amount)</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -57,11 +65,24 @@
                 <td>@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(t.Month)</td>
                 <td>@t.Year</td>
                 <td>@t.Amount.ToString("N2")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@t.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Details" asp-route-id="@t.Id" class="btn btn-info btn-sm">Details</a>
+                    <button type="button"
+                            class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            data-entity-id="@t.Id"
+                            data-entity-value="@t.PaymentName">
+                        Delete
+                    </button>
+                </td>
             </tr>
         }
     </tbody>
 </table>
 
+<!-- Pagination -->
 <div>
     @if (Model.HasPreviousPage)
     {
@@ -87,3 +108,12 @@
            class="btn btn-outline-primary">Next</a>
     }
 </div>
+
+<!-- Delete Modal -->
+@await Html.PartialAsync("_DeleteModal", new DeleteModalViewModel
+{
+    EntityName = "Transaction",
+    EntityValue = "", // JS will populate
+    EntityId = 0,     // JS will populate
+    ActionUrl = Url.Action("Delete", "Transaction")
+})

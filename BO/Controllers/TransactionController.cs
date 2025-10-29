@@ -97,60 +97,67 @@ namespace BO.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Index( int? selectedUnitId,
-                                                int? selectedMonth,
-                                                int? selectedYear,
-                                                int? selectedPaymentId,
-                                                int pageNumber = 1,
-                                                int pageSize = 10 )
+        public async Task<IActionResult> Index(TransactionFilterViewModel filter, int pageNumber = 1, int pageSize = 10)
         {
-            // Filter object
-            var filter = new TransactionFilter
+            // Default current month/year if not selected
+            filter.SelectedMonth ??= DateTime.Now.Month;
+            filter.SelectedYear ??= DateTime.Now.Year;
+
+            // Map the filter to domain filter
+            var filterEntity = new TransactionFilter
             {
-                UnitId = selectedUnitId,
-                MonthId = selectedMonth,
-                YearId = selectedYear,
-                PaymentId = selectedPaymentId
+                UnitId = filter.SelectedUnitId,
+                MonthId = filter.SelectedMonth,
+                YearId = filter.SelectedYear,
+                PaymentId = filter.SelectedPaymentId
             };
 
-            var paginated = await _transactionService.GetPaginatedWithFiltersAsync(filter, pageNumber, pageSize);
+            // Get paginated, filtered result
+            var paginated = await _transactionService.GetPaginatedWithFiltersAsync(filterEntity, pageNumber, pageSize);
 
-            var units = _unitService.GetAll();
+            // Fetch dropdown sources
+            var units = await _unitService.GetAllWithDistrictCityFloor();
             var payments = await _paymentService.GetAllOrderedByType();
 
+            // Build view model
             var viewModel = new TransactionListViewModel
             {
                 Filter = new TransactionFilterViewModel
                 {
-                    SelectedUnitId = selectedUnitId,
-                    SelectedMonth = selectedMonth ?? DateTime.Now.Month,
-                    SelectedYear = selectedYear ?? DateTime.Now.Year,
-                    SelectedPaymentId = selectedPaymentId,
+                    SelectedUnitId = filter.SelectedUnitId,
+                    SelectedMonth = filter.SelectedMonth,
+                    SelectedYear = filter.SelectedYear,
+                    SelectedPaymentId = filter.SelectedPaymentId,
+
                     Units = units.Select(u => new SelectListItem
                     {
                         Value = u.Id.ToString(),
-                        Text = u.Name,
-                        Selected = (u.Id == selectedUnitId)
+                        Text = $"{u.District.Name} - {u.Address} - {u.Floor.Name} - {u.Name}",
+                        Selected = (u.Id == filter.SelectedUnitId)
                     }),
+
                     Months = Enumerable.Range(1, 12).Select(m => new SelectListItem
                     {
                         Value = m.ToString(),
                         Text = CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(m),
-                        Selected = (m == selectedMonth)
+                        Selected = (m == filter.SelectedMonth)
                     }),
+
                     Years = Enumerable.Range(DateTime.Now.Year - 5, 10).Select(y => new SelectListItem
                     {
                         Value = y.ToString(),
                         Text = y.ToString(),
-                        Selected = (y == selectedYear)
+                        Selected = (y == filter.SelectedYear)
                     }),
+
                     Payments = payments.Select(p => new SelectListItem
                     {
                         Value = p.Id.ToString(),
                         Text = $"{p.PaymentType.Name} - {p.Name}",
-                        Selected = (p.Id == selectedPaymentId)
+                        Selected = (p.Id == filter.SelectedPaymentId)
                     })
                 },
+
                 Transactions = paginated.Items.Select(t => new TransactionViewModel
                 {
                     Id = t.Id,
@@ -160,6 +167,7 @@ namespace BO.Controllers
                     PaymentName = t.Payment.Name,
                     UnitName = t.Unit.Name
                 }).ToList(),
+
                 PageIndex = paginated.PageIndex,
                 TotalPages = paginated.TotalPages
             };

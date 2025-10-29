@@ -52,6 +52,11 @@ namespace Application.Services
             return await _unitRepository.GetPaginatedWithDistrictCityCountryFloorUnitTypeAsync(pageNumber, pageSize);
         }
 
-      
+        public async Task<List<Unit>> GetAllWithDistrictCityFloor()
+        {
+            return await _unitRepository.GetAllWithDistrictCityFloor();
+        }
+
+
     }
 }

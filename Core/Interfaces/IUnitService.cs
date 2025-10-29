@@ -10,5 +10,6 @@ namespace Core.Interfaces
     public interface IUnitService : IBaseService<Unit>
     {
         Task<IPaginatedList<Unit>> GetPaginatedWithDistrictCityCountryFloorUnitTypeAsync(int pageNumber, int pageSize);
+        Task<List<Unit>> GetAllWithDistrictCityFloor();
     }
 }

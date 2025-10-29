@@ -11,5 +11,7 @@ namespace Core.Interfaces
     {
         Task<List<Payment>> GetAllOrderedByType();
         Task<IPaginatedList<Payment>> GetPaginatedWithPaymentTypeAsync(int pageNumber, int pageSize);
+      
+
     }
 }

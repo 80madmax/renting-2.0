@@ -27,6 +27,18 @@ namespace Infrastructure.Repositories
             return await _context.Units.Include(c => c.Floor).Include(c => c.UnitType).Include(c => c.District).ThenInclude(c => c.City).ThenInclude(c=>c.Country).FirstOrDefaultAsync(c => c.Id == id);
         }
 
+        public async Task<List<Unit>> GetAllWithDistrictCityFloor()
+        {
+            return await _context.Units
+                                    .Include(u => u.District)
+                                    .Include(u => u.District.City)
+                                    .Include(u => u.Floor)
+                                    .OrderBy(u => u.District.City.Name)
+                                    .ThenBy(u => u.District.Name)
+                                    .ThenBy(u => u.Address)
+                                    .ThenBy(u=>u.Floor).ToListAsync();
+        }
+
         public async Task<IPaginatedList<Unit>> GetPaginatedWithDistrictCityCountryFloorUnitTypeAsync(int pageNumber, int pageSize)
         {
             var query = _dbSet.Include(c=>c.UnitType).Include(c=>c.Floor).Include(c => c.District).ThenInclude(c => c.City).ThenInclude(c => c.Country);
