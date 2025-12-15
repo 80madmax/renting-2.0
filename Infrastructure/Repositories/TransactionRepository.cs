@@ -25,7 +25,11 @@ namespace Infrastructure.Repositories
 
         public async Task<IPaginatedList<Transaction>> GetPaginatedWithFiltersAsync(TransactionFilter filter, int pageNumber, int pageSize)
         {
-            var query = _context.Transactions.Include(t => t.Unit).Include(t => t.Payment).Include(t => t.Payment.PaymentType).AsQueryable();
+            IQueryable<Transaction> query = _context.Transactions.Include(t => t.Unit)
+                                             .Include(t => t.Unit.District)                                     
+                                             .Include(t => t.Unit.Floor)
+                                             .Include(t => t.Payment)
+                                             .Include(t => t.Payment.PaymentType);
 
             if (filter.UnitId.HasValue)
                 query = query.Where(q => q.UnitId == filter.UnitId.Value);

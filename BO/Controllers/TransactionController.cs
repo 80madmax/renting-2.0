@@ -132,7 +132,7 @@ namespace BO.Controllers
                     Units = units.Select(u => new SelectListItem
                     {
                         Value = u.Id.ToString(),
-                        Text = $"{u.District.Name} - {u.Address} - {u.Floor.Name} - {u.Name}",
+                        Text = $"{u.Name} -  {u.Floor.Name} - {u.Address} - {u.District.Name}",
                         Selected = (u.Id == filter.SelectedUnitId)
                     }),
 
@@ -165,7 +165,11 @@ namespace BO.Controllers
                     Month = t.Month,
                     Year = t.Year,
                     PaymentName = t.Payment.Name,
-                    UnitName = t.Unit.Name
+                    UnitName = t.Unit.Name,
+                    Floor = t.Unit.Floor.Name,
+                    Address = t.Unit.Address,
+                    District = t.Unit.District.Name
+                    
                 }).ToList(),
 
                 PageIndex = paginated.PageIndex,

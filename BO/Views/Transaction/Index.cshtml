@@ -49,6 +49,9 @@
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(model => Model.Transactions[0].UnitName)</th>
+            <th>@Html.DisplayNameFor(model => Model.Transactions[0].Floor)</th>
+            <th>@Html.DisplayNameFor(model => Model.Transactions[0].Address)</th>
+            <th>@Html.DisplayNameFor(model => Model.Transactions[0].District)</th>
             <th>@Html.DisplayNameFor(model => Model.Transactions[0].PaymentName)</th>
             <th>@Html.DisplayNameFor(model => Model.Transactions[0].Month)</th>
             <th>@Html.DisplayNameFor(model => Model.Transactions[0].Year)</th>
@@ -61,6 +64,9 @@
         {
             <tr>
                 <td>@t.UnitName</td>
+                <td>@t.Floor</td>
+                <td>@t.Address</td>
+                <td>@t.District</td>
                 <td>@t.PaymentName</td>
                 <td>@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(t.Month)</td>
                 <td>@t.Year</td>
