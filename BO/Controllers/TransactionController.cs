@@ -181,5 +181,28 @@ namespace BO.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+            var transaction = await _transactionService.GetByIdWithDetails(id);
+            if (transaction == null) return NotFound();
+
+            var model = new TransactionViewModel
+            {
+                Id = transaction.Id,
+                Name = transaction.Name,
+                UnitName = transaction.Unit.Name,
+                PaymentName = transaction.Payment.Name,
+                Amount = transaction.Amount,
+                Month = transaction.Month,
+                MonthName = CultureInfo
+                                .GetCultureInfo("en-US")
+                                .DateTimeFormat
+                                .GetMonthName(transaction.Month),
+                Year = transaction.Year
+            };
+
+            return View(model);
+        }
+
     }
 }

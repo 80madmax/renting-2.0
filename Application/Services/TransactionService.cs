@@ -57,5 +57,10 @@ namespace Application.Services
         {
             return await _transactionRepository.GetFilteredTransactions(filter);
         }
+
+        public async Task<Transaction> GetByIdWithDetails(int id)
+        {
+            return await _transactionRepository.GetByIdWithDetails(id);
+        }
     }
 }

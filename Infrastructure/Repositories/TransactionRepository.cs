@@ -62,5 +62,11 @@ namespace Infrastructure.Repositories
 
             return await query.ToListAsync();
         }
+
+        public async Task<Transaction> GetByIdWithDetails(int id)
+        {
+            return await _context.Transactions.Include(t => t.Unit).Include(t => t.Payment).Include(t => t.Payment.PaymentType).FirstOrDefaultAsync(t => t.Id == id);
+        }
+
     }
 }
