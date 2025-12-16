@@ -79,6 +79,9 @@ namespace BO.Controllers
                 return View(model);
             }
 
+            var payment = await _paymentService.GetByIdAsync(model.PaymentId);
+
+
             foreach (var unitId in model.SelectedUnitIds)
             {
                 var transaction = new Transaction
@@ -87,7 +90,7 @@ namespace BO.Controllers
                     PaymentId = model.PaymentId,
                     Year = model.Year,
                     Month = model.Month,
-                    Amount = model.Amount,
+                    Amount = (payment.PaymentType?.Id == 1) ? -model.Amount : model.Amount,                    
                     Name = model.Note
                 };
 
@@ -193,9 +196,9 @@ namespace BO.Controllers
             var model = new TransactionViewModel
             {
                 Id = transaction.Id,
-                Name = transaction.Name,
-                UnitName = transaction.Unit.Name,
-                PaymentName = transaction.Payment.Name,
+                Name = transaction.Name,      
+                UnitName = $"{transaction.Unit.Name} - {transaction.Unit.Floor.Name} - {transaction.Unit.Address} - {transaction.Unit.District.Name}",
+                PaymentName = $"{transaction.Payment.PaymentType.Name} - {transaction.Payment.Name}",
                 Amount = transaction.Amount,
                 Month = transaction.Month,
                 MonthName = CultureInfo
@@ -208,5 +211,106 @@ namespace BO.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> Edit(int id)
+        {
+            var transaction = await _transactionService.GetByIdAsync(id);
+
+            // Fetch dropdown sources
+            var units = await _unitService.GetAllWithDistrictCityFloor();
+            var payments = await _paymentService.GetAllOrderedByType();
+
+            var model = new TransactionEditViewModel
+            {
+                TransactionId = transaction.Id,
+                UnitId = transaction.UnitId,
+                Month = transaction.Month,
+                Year = transaction.Year,
+                Amount= transaction.Amount,
+                Units = units.Select(u => new SelectListItem
+                {
+                    Value = u.Id.ToString(),
+                    Text = $"{u.Name} - {u.Floor.Name} - {u.Address} - {u.District.Name}"
+                }),
+
+                Payments = payments.Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = $"{p.PaymentType.Name} - {p.Name}"
+                }),
+
+                Years = Enumerable.Range(DateTime.Now.Year - 5, 11).Select(y => new SelectListItem
+                {
+                    Value = y.ToString(),
+                    Text = y.ToString()
+                }),
+
+                Months = Enumerable.Range(1, 12).Select(m => new SelectListItem
+                {
+                    Value = m.ToString(),
+                    Text = CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(m)
+                })
+            };
+
+            return View(model);
+        }
+
+        /*
+        [HttpPost]
+        public async Task<IActionResult> Edit(UnitViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var countries = _countryService.GetAll();
+                model.Countries = countries.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                });
+
+                if (model.SelectedCountryId.HasValue)
+                {
+                    var cities = await _cityService.GetByCountryId(model.SelectedCountryId.Value);
+                    model.Cities = cities.Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = c.Name
+                    });
+                }
+
+                if (model.SelectedCityId.HasValue)
+                {
+                    var districts = await _districtService.GetByCityId(model.SelectedCityId.Value);
+                    model.Districts = districts.Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = c.Name
+                    });
+                }
+
+                return View(model);
+            }
+
+            var unit = new Unit
+            {
+                Id = model.Id,
+                Name = model.Name,
+                Address = model.Address,
+                TelegramChatId = "Telegram chat Id",
+                TelegramBotToken = "Telegram bot token",
+                DistrictID = model.DistrictId,
+                FloorID = model.FloorId,
+                UnitTypeId = model.UnitTypeId,
+                Note = model.Note,
+                IsAvailable = model.IsAvailable,
+                Cost = model.Cost,
+                RentPrice = model.RentPrice,
+                UserId = model.UserId
+
+            };
+
+            await _unitService.UpdateAsync(unit);
+            return RedirectToAction(nameof(Index));
+        }
+        */
     }
 }

@@ -69,7 +69,11 @@ namespace Infrastructure.Repositories
 
         public async Task<Transaction> GetByIdWithDetails(int id)
         {
-            return await _context.Transactions.Include(t => t.Unit).Include(t => t.Payment).Include(t => t.Payment.PaymentType).FirstOrDefaultAsync(t => t.Id == id);
+            return await _context.Transactions.Include(t => t.Unit)
+                                              .Include(t => t.Unit.Floor)
+                                              .Include(t => t.Unit.District)
+                                              .Include(t => t.Payment)
+                                              .Include(t => t.Payment.PaymentType).FirstOrDefaultAsync(t => t.Id == id);
         }
 
     }
