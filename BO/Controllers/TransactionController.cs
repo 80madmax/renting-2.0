@@ -223,9 +223,11 @@ namespace BO.Controllers
             {
                 TransactionId = transaction.Id,
                 UnitId = transaction.UnitId,
+                PaymentId = transaction.PaymentId,
                 Month = transaction.Month,
                 Year = transaction.Year,
-                Amount= transaction.Amount,
+                Amount = transaction.Amount,
+                Note = transaction.Name,
                 Units = units.Select(u => new SelectListItem
                 {
                     Value = u.Id.ToString(),
@@ -254,63 +256,28 @@ namespace BO.Controllers
             return View(model);
         }
 
-        /*
+        
         [HttpPost]
-        public async Task<IActionResult> Edit(UnitViewModel model)
+        public async Task<IActionResult> Edit(TransactionEditViewModel model)
         {
             if (!ModelState.IsValid)
-            {
-                var countries = _countryService.GetAll();
-                model.Countries = countries.Select(c => new SelectListItem
-                {
-                    Value = c.Id.ToString(),
-                    Text = c.Name
-                });
-
-                if (model.SelectedCountryId.HasValue)
-                {
-                    var cities = await _cityService.GetByCountryId(model.SelectedCountryId.Value);
-                    model.Cities = cities.Select(c => new SelectListItem
-                    {
-                        Value = c.Id.ToString(),
-                        Text = c.Name
-                    });
-                }
-
-                if (model.SelectedCityId.HasValue)
-                {
-                    var districts = await _districtService.GetByCityId(model.SelectedCityId.Value);
-                    model.Districts = districts.Select(c => new SelectListItem
-                    {
-                        Value = c.Id.ToString(),
-                        Text = c.Name
-                    });
-                }
-
+            {              
                 return View(model);
             }
 
-            var unit = new Unit
+            var transaction = new Transaction
             {
-                Id = model.Id,
-                Name = model.Name,
-                Address = model.Address,
-                TelegramChatId = "Telegram chat Id",
-                TelegramBotToken = "Telegram bot token",
-                DistrictID = model.DistrictId,
-                FloorID = model.FloorId,
-                UnitTypeId = model.UnitTypeId,
-                Note = model.Note,
-                IsAvailable = model.IsAvailable,
-                Cost = model.Cost,
-                RentPrice = model.RentPrice,
-                UserId = model.UserId
-
+                Id = model.TransactionId,
+                Name = model.Note,
+                Month = model.Month,
+                Year = model.Year,
+                PaymentId = model.PaymentId,
+                UnitId = model.UnitId,
+                Amount = model.Amount
             };
 
-            await _unitService.UpdateAsync(unit);
+            await _transactionService.UpdateAsync(transaction);
             return RedirectToAction(nameof(Index));
         }
-        */
     }
 }
