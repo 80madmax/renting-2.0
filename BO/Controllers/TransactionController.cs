@@ -182,6 +182,8 @@ namespace BO.Controllers
             return View(viewModel);
         }
 
+
+
         public async Task<IActionResult> Delete(int id)
         {
             await _transactionService.DeleteAsync(id);
