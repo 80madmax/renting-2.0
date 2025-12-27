@@ -102,9 +102,13 @@ namespace BO.Controllers
 
         public async Task<IActionResult> Index(TransactionFilterViewModel filter, int pageNumber = 1, int pageSize = 10)
         {
-            // Default current month/year if not selected
-            filter.SelectedMonth ??= DateTime.Now.Month;
-            filter.SelectedYear ??= DateTime.Now.Year;
+            if (filter.IsInitialLoad)
+            {
+                filter.SelectedMonth ??= DateTime.Now.Month;
+                
+                filter.SelectedYear ??= DateTime.Now.Year;
+
+            }
 
             // Map the filter to domain filter
             var filterEntity = new TransactionFilter
@@ -131,6 +135,7 @@ namespace BO.Controllers
                     SelectedMonth = filter.SelectedMonth,
                     SelectedYear = filter.SelectedYear,
                     SelectedPaymentId = filter.SelectedPaymentId,
+                    IsInitialLoad = filter.IsInitialLoad,
 
                     Units = units.Select(u => new SelectListItem
                     {
@@ -167,7 +172,7 @@ namespace BO.Controllers
                     Amount = t.Amount,
                     Month = t.Month,
                     Year = t.Year,
-                    PaymentName = t.Payment.Name,
+                    PaymentName = $"{t.Payment.PaymentType.Name} - {t.Payment.Name}",
                     UnitName = t.Unit.Name,
                     Floor = t.Unit.Floor.Name,
                     Address = t.Unit.Address,
@@ -267,6 +272,8 @@ namespace BO.Controllers
                 return View(model);
             }
 
+            var payment = await _paymentService.GetByIdAsync(model.PaymentId);
+
             var transaction = new Transaction
             {
                 Id = model.TransactionId,
@@ -275,7 +282,8 @@ namespace BO.Controllers
                 Year = model.Year,
                 PaymentId = model.PaymentId,
                 UnitId = model.UnitId,
-                Amount = model.Amount
+                Amount = (payment.PaymentType?.Id == 1) ? -Math.Abs(model.Amount) : Math.Abs(model.Amount)   
+               
             };
 
             await _transactionService.UpdateAsync(transaction);

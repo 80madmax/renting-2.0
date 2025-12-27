@@ -13,6 +13,7 @@
 
 <!-- Filter form -->
 <form method="get" asp-action="Index" class="mb-4">
+    <input type="hidden" asp-for="Filter.IsInitialLoad" value="false" />
     <div class="row">
         <div class="col-md-3">
             <label>Unit</label>

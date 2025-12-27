@@ -8,6 +8,7 @@ namespace BO.ViewModels
         public int? SelectedMonth { get; set; }
         public int? SelectedYear { get; set; }
         public int? SelectedPaymentId { get; set; }
+        public bool IsInitialLoad { get; set; } = true;
 
         public IEnumerable<SelectListItem> Units { get; set; } = Enumerable.Empty<SelectListItem>();
         public IEnumerable<SelectListItem> Months { get; set; } = Enumerable.Empty<SelectListItem>();
