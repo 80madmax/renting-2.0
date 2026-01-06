@@ -14,6 +14,7 @@ namespace BO.ViewModels
         [Required]
         public int CountryId { get; set; }
 
+        [Display(Name = "Country")]
         public string? CountryName { get; set; } 
 
         public IEnumerable<SelectListItem> Countries { get; set; } = Enumerable.Empty<SelectListItem>();

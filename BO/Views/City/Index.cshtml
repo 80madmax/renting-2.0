@@ -10,23 +10,21 @@
     <a asp-action="Create" class="btn btn-primary">Create New City</a>
 </p>
 
-<table class="table table-bordered">
+<table class="table">
     <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(m => m.Cities[0].Id)</th>
+        <tr>         
             <th>@Html.DisplayNameFor(m => m.Cities[0].Name)</th>
             <th>@Html.DisplayNameFor(m => m.Cities[0].CountryName)</th>
-            <th>Actions</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var city in Model.Cities)
         {
-            <tr>
-                <td>@city.Id</td>
+            <tr>              
                 <td>@city.Name</td>
                 <td>@city.CountryName</td>
-                <td>
+                <td class="text-end">
                     <a asp-action="Edit" asp-route-id="@city.Id" class="btn btn-warning btn-sm">Edit</a>
                     <a asp-action="Details" asp-route-id="@city.Id" class="btn btn-info btn-sm">Details</a>
                     <button type="button"

@@ -14,17 +14,15 @@
 
 <table class="table">
     <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => Model.Countries[0].Id)</th>
+        <tr>        
             <th>@Html.DisplayNameFor(model => Model.Countries[0].Name)</th>
-            <th>Actions</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var country in Model.Countries)
         {
-            <tr>
-                <td>@country.Id</td>
+            <tr>          
                 <td>@country.Name</td>
                 <td class="text-end">
                     <a asp-action="Edit" asp-route-id="@country.Id" class="btn btn-warning btn-sm">Edit</a>

@@ -1,7 +1,12 @@
 ﻿@model BO.ViewModels.CountryViewModel
 @using BO.ViewModels
 
-<h2>Country Details</h2>
+
+@{
+    ViewData["Title"] = "Country Details";
+}
+
+<h1>@ViewData["Title"]</h1>
 
 <div>
     <h4>@Model.Name</h4>

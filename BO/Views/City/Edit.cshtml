@@ -6,11 +6,9 @@
     ViewData["Title"] = "Edit City";
 }
 
-<h1>Edit City</h1>
+<h1>@ViewData["Title"]</h1>
 
 <form asp-action="Edit">
-    <input type="hidden" asp-for="Id" />
-
     <div class="form-group">
         <label asp-for="Name" class="control-label"></label>
         <input asp-for="Name" class="form-control" />
