@@ -8,6 +8,7 @@ namespace BO.ViewModels
         public int Id { get; set; }
         
         [Required]
+        [Display(Name = "City")]
         public string Name { get; set; }
         
         [Display(Name = "Country")]

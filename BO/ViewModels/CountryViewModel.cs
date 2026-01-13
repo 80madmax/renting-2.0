@@ -7,6 +7,7 @@ namespace BO.ViewModels
         public int Id {  get; set; }
 
         [Required]
+        [Display(Name = "Country")]
         public string Name { get; set; } = string.Empty;
     }
 }

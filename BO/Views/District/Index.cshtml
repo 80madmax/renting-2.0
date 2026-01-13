@@ -15,22 +15,20 @@
 <table class="table">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(model => Model.Districts[0].Id)</th>
             <th>@Html.DisplayNameFor(model => Model.Districts[0].Name)</th>
             <th>@Html.DisplayNameFor(model => Model.Districts[0].CityName)</th>
             <th>@Html.DisplayNameFor(model => Model.Districts[0].CountryName)</th>
-            <th>Actions</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var country in Model.Districts)
         {
             <tr>
-                <td>@country.Id</td>
                 <td>@country.Name</td>
                 <td>@country.CityName</td>
                 <td>@country.CountryName</td>
-                <td>
+                <td class="text-end">
                     <a asp-action="Edit" asp-route-id="@country.Id" class="btn btn-warning btn-sm">Edit</a>
                     <a asp-action="Details" asp-route-id="@country.Id" class="btn btn-info btn-sm">Details</a>
                     <button type="button"
