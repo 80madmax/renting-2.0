@@ -162,6 +162,8 @@ namespace BO.Controllers
                     Address = d.Address,
                     FloorName = d.Floor.Name,
                     UnitTypeName = d.UnitType.Name,
+                    Cost = d.Cost,
+                    RentPrice = d.RentPrice,
                     IsAvailable = d.IsAvailable
                 }).ToList(),
                 PageIndex = paginatedUnits.PageIndex,
