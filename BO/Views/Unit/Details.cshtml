@@ -38,6 +38,9 @@
 
         <dt class="col-sm-2">Rent Price</dt>
         <dd class="col-sm-10">@Model.RentPrice</dd>
+
+        <dt class="col-sm-2">Is Available</dt>
+        <dd class="col-sm-10"><input type="checkbox" disabled @(Model.IsAvailable ? "checked" : "") /></dd>
     </dl>
 </div>
 
