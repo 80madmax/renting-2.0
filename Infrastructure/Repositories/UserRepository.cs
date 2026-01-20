@@ -24,7 +24,7 @@ namespace Infrastructure.Repositories
 
         public override async Task<User> GetByIdAsync(int id)
         {
-            return await _context.Users.Include(c => c.Role).FirstOrDefaultAsync(c => c.Id == c.Id);
+            return await _context.Users.Include(c => c.Role).FirstOrDefaultAsync(u => u.Id == id);
         }
 
 
