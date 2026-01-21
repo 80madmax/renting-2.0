@@ -38,7 +38,7 @@
 
     <div class="form-group">
         <label asp-for="Amount"></label>
-        <input asp-for="Amount" class="form-control" />
+        <input name="Amount" class="form-control" value="@Model.Amount.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))" />
         <span asp-validation-for="Amount" class="text-danger"></span>
     </div>
 

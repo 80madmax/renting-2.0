@@ -19,8 +19,7 @@ namespace BO.ViewModels
         [Required]
         public int Month { get; set; }
 
-        [Required]
-        public decimal Amount { get; set; }
+        public decimal Amount { get; set; } = 0;
 
         public string? Note { get; set; }
 
