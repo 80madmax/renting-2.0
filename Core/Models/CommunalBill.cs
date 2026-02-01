@@ -6,7 +6,16 @@ using System.Threading.Tasks;
 
 namespace Core.Models
 {
-    public class CommunalBills : BaseModel
+    public class CommunalBill
     {
+        public int ID { set; get; }
+        public int UnitId {  set; get; }
+        
+        public int Year { set; get; }
+
+        public int Month { set; get; }
+
+        public int CommunalExpenseId { set; get; }
+
     }
 }
