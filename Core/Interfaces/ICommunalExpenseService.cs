@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Core.Interfaces
 {
-    public interface ICommunalExpenseService : IBaseOnlyListService<CommunalExpense>
+    public interface ICommunalExpenseService 
     {
-
+        Task<List<CommunalExpense>> GetAllOrdered();
     }
 }

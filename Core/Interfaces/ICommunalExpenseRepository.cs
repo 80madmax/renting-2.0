@@ -9,5 +9,6 @@ namespace Core.Interfaces
 {
     public interface ICommunalExpenseRepository : IBaseOnlyListRepository<CommunalExpense>
     {
+         Task<List<CommunalExpense>> GetAllOrdered();
     }
 }
