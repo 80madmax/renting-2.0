@@ -29,6 +29,7 @@ namespace Infrastructure.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<CommunalExpense> CommunalExpenses { get; set; }
+        public DbSet<CommunalBill> CommunalBills { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

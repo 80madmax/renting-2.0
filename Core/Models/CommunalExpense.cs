@@ -8,5 +8,6 @@ namespace Core.Models
 {
     public class CommunalExpense : BaseModel
     {
+        public ICollection<CommunalBill> CommunalBills { get; set; }
     }
 }

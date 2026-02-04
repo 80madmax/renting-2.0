@@ -38,6 +38,10 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<ICommunalExpenseService, CommunalExpenseService>();
+builder.Services.AddScoped<ICommunalExpenseRepository, CommunalExpenseRepository>();
+builder.Services.AddScoped<ICommunalBillService, CommunalBillService>();
+builder.Services.AddScoped<ICommunalBillRepository, CommunalBillRepository>();
 
 
 var app = builder.Build();

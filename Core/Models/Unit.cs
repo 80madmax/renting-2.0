@@ -34,6 +34,7 @@ namespace Core.Models
 
         public ICollection<Message> Messages { get; set; }
         public ICollection<Transaction> Transactions { get; set; }
+        public ICollection<CommunalBill> CommunalBills { get; set; }
 
     }
 }

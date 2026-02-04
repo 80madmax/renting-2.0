@@ -1,0 +1,63 @@
+﻿@model BO.ViewModels.CommunalBillCreateViewModel
+
+@{
+    ViewData["Title"] = "Paid Communal Bills";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="SelectedUnitIds"></label>
+        <select asp-for="SelectedUnitIds"
+                asp-items="Model.Units"
+                class="form-control select2-units"
+                multiple="multiple"
+                style="width: 100%;">
+        </select>
+        <span asp-validation-for="SelectedUnitIds" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SelectedCommunalExpenseIds"></label>
+        <select asp-for="SelectedCommunalExpenseIds"
+                asp-items="Model.CommunalExpenses"
+                class="form-control select2-expenses"
+                multiple="multiple"
+                style="width: 100%;">
+        </select>
+        <span asp-validation-for="SelectedCommunalExpenseIds" class="text-danger"></span>
+    </div>   
+
+    <div class="form-group">
+        <label asp-for="Month"></label>
+        <select asp-for="Month" asp-items="Model.Months" class="form-control"></select>
+        <span asp-validation-for="Month" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Year"></label>
+        <select asp-for="Year" asp-items="Model.Years" class="form-control"></select>
+        <span asp-validation-for="Year" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Create</button>
+    <a asp-action="Index" class="btn btn-secondary mt-2">Back to List</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('.select2-units').select2({
+                placeholder: "Select units",
+                allowClear: true
+            });
+
+              $('.select2-expenses').select2({
+                placeholder: "Select communal expenses",
+                allowClear: true
+            });
+        });
+    </script>
+}

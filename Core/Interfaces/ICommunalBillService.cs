@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.Interfaces
 {
-    public interface ICommunalBillRepository : IBaseRepository<CommunalBill>
+    public interface ICommunalBillService : IBaseService<CommunalBill>
     {
     }
 }
