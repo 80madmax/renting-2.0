@@ -1,5 +1,6 @@
 ﻿using Application.Services;
 using BO.ViewModels;
+using Core.Filters;
 using Core.Interfaces;
 using Core.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -10,13 +11,13 @@ namespace BO.Controllers
 {
     public class CommunalBillController : Controller
     {
-        private readonly ICommunalBillService _transactionService;
+        private readonly ICommunalBillService _communalBillService;
         private readonly IUnitService _unitService;
         private readonly ICommunalExpenseService _communalExpenseService;
 
         public CommunalBillController(ICommunalBillService communalBillService, IUnitService unitService, ICommunalExpenseService communalExpenseService)
         {
-            _transactionService = communalBillService;
+            _communalBillService = communalBillService;
             _unitService = unitService;
             _communalExpenseService = communalExpenseService;
         }
@@ -97,11 +98,94 @@ namespace BO.Controllers
                         Month = model.Month                      
                     };
 
-                    await _transactionService.AddAsync(communalBill);
+                    await _communalBillService.AddAsync(communalBill);
                 }              
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Index(CommunalBillFilterViewModel filter, int pageNumber = 1, int pageSize = 10)
+        {
+            if (filter.IsInitialLoad)
+            {
+                filter.SelectedMonth ??= DateTime.Now.Month;
+
+                filter.SelectedYear ??= DateTime.Now.Year;
+
+            }
+
+            // Map the filter to domain filter
+            var filterEntity = new CommunalBillFilter
+            {
+                UnitId = filter.SelectedUnitId,
+                MonthId = filter.SelectedMonth,
+                YearId = filter.SelectedYear,
+                CommunalExpenseId = filter.SelectedCommunalExpenseId
+            };
+
+            // Get paginated, filtered result
+            var paginated = await _communalBillService.GetPaginatedWithFiltersAsync(filterEntity, pageNumber, pageSize);
+
+            // Fetch dropdown sources
+            var units = await _unitService.GetAllWithDistrictCityFloor();
+            var communalExpense = await _communalExpenseService.GetAllOrdered();
+
+            // Build view model
+            var viewModel = new CommunalBillListViewModel
+            {
+                Filter = new CommunalBillFilterViewModel
+                {
+                    SelectedUnitId = filter.SelectedUnitId,
+                    SelectedMonth = filter.SelectedMonth,
+                    SelectedYear = filter.SelectedYear,
+                    SelectedCommunalExpenseId = filter.SelectedCommunalExpenseId,
+                    IsInitialLoad = filter.IsInitialLoad,
+
+                    Units = units.Select(u => new SelectListItem
+                    {
+                        Value = u.Id.ToString(),
+                        Text = $"{u.Name} -  {u.Floor.Name} - {u.Address} - {u.District.Name}",
+                        Selected = (u.Id == filter.SelectedUnitId)
+                    }),
+
+                    Months = Enumerable.Range(1, 12).Select(m => new SelectListItem
+                    {
+                        Value = m.ToString(),
+                        Text = CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(m),
+                        Selected = (m == filter.SelectedMonth)
+                    }),
+
+                    Years = Enumerable.Range(DateTime.Now.Year - 5, 10).Select(y => new SelectListItem
+                    {
+                        Value = y.ToString(),
+                        Text = y.ToString(),
+                        Selected = (y == filter.SelectedYear)
+                    }),
+
+                    CommunalExpenses = communalExpense.Select(p => new SelectListItem
+                    {
+                        Value = p.Id.ToString(),
+                        Text = p.Name,
+                        Selected = (p.Id == filter.SelectedCommunalExpenseId)
+                    })
+                },
+
+                CommunalBills = paginated.Items.Select(t => new CommunalBillViewModel
+                {
+                    Id = t.Id,                  
+                    Month = t.Month,
+                    Year = t.Year,
+                    CommunalExpense = t.CommunalExpense.Name,
+                    Unit = $"{ t.Unit.Name + "," + t.Unit.Address + "," + t.Unit.District.Name}"
+
+                }).ToList(),
+
+                PageIndex = paginated.PageIndex,
+                TotalPages = paginated.TotalPages
+            };
+
+            return View(viewModel);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Core.Models;
+﻿using Core.Filters;
+using Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,6 @@ namespace Core.Interfaces
 {
     public interface ICommunalBillService : IBaseService<CommunalBill>
     {
+        Task<IPaginatedList<CommunalBill>> GetPaginatedWithFiltersAsync(CommunalBillFilter filter, int pageNumber, int pageSize);
     }
 }

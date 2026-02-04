@@ -1,4 +1,5 @@
-﻿using Core.Interfaces;
+﻿using Core.Filters;
+using Core.Interfaces;
 using Core.Models;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,11 @@ namespace Application.Services
         public async Task<IPaginatedList<CommunalBill>> GetPaginatedAsync(int pageNumber, int pageSize)
         {
             return await _communalBillRepository.GetPaginatedAsync(pageNumber, pageSize);
+        }
+
+        public async Task<IPaginatedList<CommunalBill>> GetPaginatedWithFiltersAsync(CommunalBillFilter filter, int pageNumber, int pageSize)
+        {            
+            return await _communalBillRepository.GetPaginatedWithFiltersAsync(filter, pageNumber, pageSize);
         }
 
     }

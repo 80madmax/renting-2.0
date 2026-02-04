@@ -9,7 +9,7 @@ namespace Core.Models
 {
     public class CommunalBill
     {
-        public int ID { set; get; }
+        public int Id { set; get; }
         public int UnitId {  set; get; }        
         public int Year { set; get; }
         public int Month { set; get; }
