@@ -1,0 +1,118 @@
+﻿@using BO.ViewModels
+@model CommunalBillListViewModel
+
+@{
+    ViewData["Title"] = "Communal Bills";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Communal Bill</a>
+</p>
+
+<!-- Filter form -->
+<form method="get" asp-action="Index" class="mb-4">
+    <input type="hidden" asp-for="Filter.IsInitialLoad" value="false" />
+    <div class="row">
+        <div class="col-md-3">
+            <label>Unit</label>
+            <select asp-for="Filter.SelectedUnitId" asp-items="Model.Filter.Units" class="form-control">
+                <option value="">-- All Units --</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label>Communal Expense</label>
+            <select asp-for="Filter.SelectedCommunalExpenseId" asp-items="Model.Filter.CommunalExpenses" class="form-control">
+                <option value="">-- All Payments --</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Month</label>
+            <select asp-for="Filter.SelectedMonth" asp-items="Model.Filter.Months" class="form-control">
+                <option value="">-- All Months --</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Year</label>
+            <select asp-for="Filter.SelectedYear" asp-items="Model.Filter.Years" class="form-control">
+                <option value="">-- All Years --</option>
+            </select>
+        </div>      
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
+
+<!-- Transactions table -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => Model.CommunalBills[0].Unit)</th>
+            <th>@Html.DisplayNameFor(model => Model.CommunalBills[0].CommunalExpense)</th>           
+            <th>@Html.DisplayNameFor(model => Model.CommunalBills[0].Month)</th>
+            <th>@Html.DisplayNameFor(model => Model.CommunalBills[0].Year)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cb in Model.CommunalBills)
+        {
+            <tr>
+                <td>@cb.Unit</td>
+                <td>@cb.CommunalExpense</td>
+                <td>@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(cb.Month)</td>
+                <td>@cb.Year</td>               
+                <td>
+                    <a asp-action="Edit" asp-route-id="@cb.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Details" asp-route-id="@cb.Id" class="btn btn-info btn-sm">Details</a>
+                    <button type="button"
+                            class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            data-entity-id="@cb.Id"
+                            data-entity-value="@cb.CommunalExpense">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Pagination -->
+<div>
+    @if (Model.HasPreviousPage)
+    {
+        <a asp-action="Index"
+           asp-route-pageNumber="@(Model.PageIndex - 1)"
+           asp-route-selectedUnitId="@Model.Filter.SelectedUnitId"
+           asp-route-selectedMonth="@Model.Filter.SelectedMonth"
+           asp-route-selectedYear="@Model.Filter.SelectedYear"
+           asp-route-selectedPaymentId="@Model.Filter.SelectedCommunalExpenseId"
+           class="btn btn-outline-primary">Previous</a>
+    }
+
+    Page @Model.PageIndex of @Model.TotalPages
+
+    @if (Model.HasNextPage)
+    {
+        <a asp-action="Index"
+           asp-route-pageNumber="@(Model.PageIndex + 1)"
+           asp-route-selectedUnitId="@Model.Filter.SelectedUnitId"
+           asp-route-selectedMonth="@Model.Filter.SelectedMonth"
+           asp-route-selectedYear="@Model.Filter.SelectedYear"
+           asp-route-selectedPaymentId="@Model.Filter.SelectedCommunalExpenseId"
+           class="btn btn-outline-primary">Next</a>
+    }
+</div>
+
+<!-- Delete Modal -->
+@await Html.PartialAsync("_DeleteModal", new DeleteModalViewModel
+{
+    EntityName = "CommunalBill",
+    EntityValue = "", // JS will populate
+    EntityId = 0,     // JS will populate
+    ActionUrl = Url.Action("Delete", "CommunalBill")
+})

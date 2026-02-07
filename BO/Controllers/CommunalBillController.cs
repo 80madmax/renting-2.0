@@ -177,7 +177,7 @@ namespace BO.Controllers
                     Month = t.Month,
                     Year = t.Year,
                     CommunalExpense = t.CommunalExpense.Name,
-                    Unit = $"{ t.Unit.Name + "," + t.Unit.Address + "," + t.Unit.District.Name}"
+                    Unit = $"{ t.Unit.Name + "," + t.Unit.Floor.Name + "," + t.Unit.Address + "," + t.Unit.District.Name}"
 
                 }).ToList(),
 
@@ -187,5 +187,29 @@ namespace BO.Controllers
 
             return View(viewModel);
         }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _communalBillService.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
+        }
+        
+        public async Task<IActionResult> Details(int id)
+        {
+            var communalBill = await _communalBillService.GetByIdWithDetails(id);
+            if (communalBill == null) return NotFound();
+
+            var model = new CommunalBillViewModel
+            {
+                Id = communalBill.Id,
+                Unit = $"{communalBill.Unit.Name + "," + communalBill.Unit.Floor.Name + "," + communalBill.Unit.Address + "," + communalBill.Unit.District.Name}",
+                CommunalExpense = communalBill.CommunalExpense.Name,
+                Month = communalBill.Month,
+                Year = communalBill.Year
+            };
+
+            return View(model);
+        }
     }
+
 }

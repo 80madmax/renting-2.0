@@ -1,0 +1,43 @@
+﻿@model BO.ViewModels.CommunalBillViewModel
+@using BO.ViewModels
+
+<h2>Communal Bill Details</h2>
+
+<div>
+    <h4>@Model.Unit / @Model.CommunalExpense</h4>
+    <hr />
+    <dl class="row">
+        <input type="hidden" asp-for="Id" />
+
+        <dt class="col-sm-2">Unit</dt>
+        <dd class="col-sm-10">@Model.Unit</dd>
+
+        <dt class="col-sm-2">Communal Expense</dt>
+        <dd class="col-sm-10">@Model.CommunalExpense</dd>
+
+        <dt class="col-sm-2">Month</dt>
+        <dd class="col-sm-10">@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(Model.Month)</dd>
+
+        <dt class="col-sm-2">Year</dt>
+        <dd class="col-sm-10">@Model.Year</dd>
+    </dl>
+</div>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+<button type="button"
+        class="btn btn-danger"
+        data-bs-toggle="modal"
+        data-bs-target="#deleteModal"
+        data-entity-id="@Model.Id"
+        data-entity-value="@Model.CommunalExpense">
+    Delete
+</button>
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>
+
+@await Html.PartialAsync("_DeleteModal", new DeleteModalViewModel
+{
+    EntityName = "Transaction",
+    EntityValue = "", // placeholder; JS sets it dynamically
+    EntityId = 0,     // placeholder; JS sets it dynamically
+    ActionUrl = Url.Action("Delete", "Transaction")
+})

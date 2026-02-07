@@ -52,5 +52,10 @@ namespace Application.Services
             return await _communalBillRepository.GetPaginatedWithFiltersAsync(filter, pageNumber, pageSize);
         }
 
+        public async Task<CommunalBill> GetByIdWithDetails(int id)
+        {
+            return await _communalBillRepository.GetByIdWithDetails(id);
+        }
+
     }
 }

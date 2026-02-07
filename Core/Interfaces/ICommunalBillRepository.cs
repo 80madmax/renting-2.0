@@ -11,5 +11,6 @@ namespace Core.Interfaces
     public interface ICommunalBillRepository : IBaseRepository<CommunalBill>
     {
         Task<IPaginatedList<CommunalBill>> GetPaginatedWithFiltersAsync(CommunalBillFilter filter, int pageNumber, int pageSize);
+        Task<CommunalBill> GetByIdWithDetails(int id);
     }
 }
