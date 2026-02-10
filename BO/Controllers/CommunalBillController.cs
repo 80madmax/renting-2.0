@@ -210,6 +210,71 @@ namespace BO.Controllers
 
             return View(model);
         }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var communalBill = await _communalBillService.GetByIdAsync(id);
+
+            // Fetch dropdown sources
+            var units = await _unitService.GetAllWithDistrictCityFloor();
+            var communalExpenses = await _communalExpenseService.GetAllOrdered();
+
+            var model = new CommunalBillEditViewModel
+            {
+                CommunalBillId = communalBill.Id,
+                UnitId = communalBill.UnitId,
+                CommunalExpenseId = communalBill.CommunalExpenseId,
+                Month = communalBill.Month,
+                Year = communalBill.Year,          
+                Units = units.Select(u => new SelectListItem
+                {
+                    Value = u.Id.ToString(),
+                    Text = $"{u.Name} - {u.Floor.Name} - {u.Address} - {u.District.Name}"
+                }),
+
+                CommunalExpenses = communalExpenses.Select(p => new SelectListItem
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.Name
+                }),
+
+                Years = Enumerable.Range(DateTime.Now.Year - 5, 11).Select(y => new SelectListItem
+                {
+                    Value = y.ToString(),
+                    Text = y.ToString()
+                }),
+
+                Months = Enumerable.Range(1, 12).Select(m => new SelectListItem
+                {
+                    Value = m.ToString(),
+                    Text = CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(m)
+                })
+            };
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(CommunalBillEditViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var communalBill = new CommunalBill
+            {
+                Id = model.CommunalBillId,              
+                Month = model.Month,
+                Year = model.Year,
+                CommunalExpenseId = model.CommunalExpenseId,
+                UnitId = model.UnitId
+            };
+
+            await _communalBillService.UpdateAsync(communalBill);
+            return RedirectToAction(nameof(Index));
+        }
     }
 
 }
