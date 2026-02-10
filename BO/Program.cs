@@ -42,7 +42,7 @@ builder.Services.AddScoped<ICommunalExpenseService, CommunalExpenseService>();
 builder.Services.AddScoped<ICommunalExpenseRepository, CommunalExpenseRepository>();
 builder.Services.AddScoped<ICommunalBillService, CommunalBillService>();
 builder.Services.AddScoped<ICommunalBillRepository, CommunalBillRepository>();
-
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 
 var app = builder.Build();
 
