@@ -1,0 +1,111 @@
+﻿@model BO.ViewModels.DashboardViewModel
+@using System.Text.Json
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+    string MonthName(int month) =>
+        CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetAbbreviatedMonthName(month);
+
+    var labels = Model.ProfitPerMonth.MonthlyProfits.Select(m => MonthName(m.Month)).ToList();
+    var values = Model.ProfitPerMonth.MonthlyProfits.Select(m => m.Profit).ToList();
+
+    var labelsJson = JsonSerializer.Serialize(labels);
+    var valuesJson = JsonSerializer.Serialize(values);
+
+    var total = Model.ProfitPerMonth.MonthlyProfits.Sum(x => x.Profit);
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Dashboard</h2>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div>
+                            <h4 class="mb-1">Profit per month</h4>
+                            <div class="text-muted">Current year: <strong>@Model.ProfitPerMonth.Year</strong></div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-muted small">Total</div>
+                            <div class="fs-4 fw-semibold">@total.ToString("N2")</div>
+                        </div>
+                    </div>
+
+                    <hr class="my-3" />
+
+                    <div style="height: 320px;">
+                        <canvas id="profitPerMonthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="mb-3">Breakdown</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th class="text-end">Profit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var m in Model.ProfitPerMonth.MonthlyProfits)
+                                {
+                                    <tr>
+                                        <td>@MonthName(m.Month)</td>
+                                        <td class="text-end">@m.Profit.ToString("N2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Later: add more tiles here using Model.Occupancy, Model.Balances, etc. *@
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const labels = @Html.Raw(labelsJson);
+        const values = @Html.Raw(valuesJson);
+
+        const ctx = document.getElementById('profitPerMonthChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Profit',
+                    data: values,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function(value) {
+                                return Number(value).toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

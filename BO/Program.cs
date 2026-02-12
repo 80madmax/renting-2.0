@@ -1,4 +1,6 @@
 using Application.Services;
+using Application.UseCases;
+
 //using System.Globalization;
 //using Microsoft.AspNetCore.Localization;
 using Core.Interfaces;
@@ -43,6 +45,7 @@ builder.Services.AddScoped<ICommunalExpenseRepository, CommunalExpenseRepository
 builder.Services.AddScoped<ICommunalBillService, CommunalBillService>();
 builder.Services.AddScoped<ICommunalBillRepository, CommunalBillRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<IDashboardUseCase, DashboardUseCase>();
 
 var app = builder.Build();
 
