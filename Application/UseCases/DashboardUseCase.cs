@@ -40,5 +40,16 @@ namespace Application.UseCases
             };
 
         }
+
+        public async Task<ProfitPerYearDashboardDTO> GetProfitPerYearDashboard()
+        {        
+            var yearlyProfits = await _dashboardRepository.GetProfitPerYear();
+
+            return new ProfitPerYearDashboardDTO
+            {                
+                YearlyProfits = yearlyProfits
+            };
+
+        }
     }
 }

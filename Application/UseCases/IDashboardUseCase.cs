@@ -10,5 +10,6 @@ namespace Application.UseCases
     public interface IDashboardUseCase
     {
         Task<ProfitPerMonthDashboardDTO> GetProfitPerMonthDashboard();
+        Task<ProfitPerYearDashboardDTO> GetProfitPerYearDashboard();
     }
 }

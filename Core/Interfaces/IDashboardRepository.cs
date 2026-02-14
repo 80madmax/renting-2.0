@@ -10,5 +10,7 @@ namespace Core.Interfaces
     public interface IDashboardRepository
     {
         Task<IReadOnlyList<MonthlyProfit>> GetProfitPerMonth(int year);
+        Task<IReadOnlyList<YearlyProfit>> GetProfitPerYear();
+
     }
 }

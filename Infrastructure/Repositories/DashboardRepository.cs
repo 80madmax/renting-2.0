@@ -36,5 +36,22 @@ namespace Infrastructure.Repositories
             // Convert anonymous projection to Core.ReadModels.MonthlyProfit
             return rows.Select(x => new MonthlyProfit(x.Month, x.Profit)).ToList();
         }
+
+        public async Task<IReadOnlyList<YearlyProfit>> GetProfitPerYear()
+        {
+            var rows = await _context.Transactions
+            .AsNoTracking()            
+            .GroupBy(t => t.Year)
+            .Select(g => new
+            {
+                Year = g.Key,
+                Profit = g.Sum(x => x.Amount)
+            })
+            .OrderBy(x => x.Year)
+            .ToListAsync();
+
+            // Convert anonymous projection to Core.ReadModels.MonthlyProfit
+            return rows.Select(x => new YearlyProfit(x.Year, x.Profit)).ToList();
+        }
     }
 }
