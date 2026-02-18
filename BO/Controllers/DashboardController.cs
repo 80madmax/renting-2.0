@@ -21,10 +21,14 @@ namespace BO.Controllers
 
             var profitPerYear = await _dashboardUseCase.GetProfitPerYearDashboard();
 
+            var unitsMonthlyBalances = await _dashboardUseCase.GetUnitsMonthlyBalanceDashboard();
+
             var vm = new DashboardViewModel
             {
                 ProfitPerMonth = profitPerMonth,
-                ProfitPerYear = profitPerYear
+                ProfitPerYear = profitPerYear,
+                UnitsMonthlyBalances = unitsMonthlyBalances
+
             };
 
             return View(vm);

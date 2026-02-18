@@ -51,5 +51,18 @@ namespace Application.UseCases
             };
 
         }
+
+        public async Task<UnitMonthlyBalanceDTO> GetUnitsMonthlyBalanceDashboard()
+        {
+            var year = DateTime.Now.Year;
+            var month = DateTime.Now.Month;
+
+            var unitsMonthlyBalances = await _dashboardRepository.GetUnitMonthlyBalance(month, year);
+
+            return new UnitMonthlyBalanceDTO
+            {
+                UnitsMonthlyBalances = unitsMonthlyBalances
+            };
+        }
     }
 }

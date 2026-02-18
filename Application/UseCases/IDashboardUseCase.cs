@@ -1,4 +1,5 @@
 ﻿using Application.DTOs;
+using Core.ReadModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,6 @@ namespace Application.UseCases
     {
         Task<ProfitPerMonthDashboardDTO> GetProfitPerMonthDashboard();
         Task<ProfitPerYearDashboardDTO> GetProfitPerYearDashboard();
+        Task<UnitMonthlyBalanceDTO> GetUnitsMonthlyBalanceDashboard();
     }
 }

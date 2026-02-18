@@ -8,7 +8,20 @@
     string MonthName(int month) =>
         CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetAbbreviatedMonthName(month);
 
-    // ---- Month tile data ----
+    string FullMonthName(int month) =>
+        CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(month);
+
+    // -------- Units Monthly Balances --------
+    var unitRows = Model.UnitsMonthlyBalances?.UnitsMonthlyBalances
+                   ?? new List<Core.ReadModels.UnitMonthlyBalance>();
+
+    var unitsMonth = unitRows.Count > 0 ? unitRows[0].Month : DateTime.Now.Month;
+    var unitsYear = unitRows.Count > 0 ? unitRows[0].Year : DateTime.Now.Year;
+
+    var unitsTotalAmount = unitRows.Sum(x => x.Amount);
+    var unitsTotalRent = unitRows.Sum(x => x.RentPrice);
+
+    // -------- Profit per Month --------
     var monthLabels = Model.ProfitPerMonth.MonthlyProfits.Select(m => MonthName(m.Month)).ToList();
     var monthValues = Model.ProfitPerMonth.MonthlyProfits.Select(m => m.Profit).ToList();
 
@@ -17,7 +30,7 @@
 
     var monthTotal = Model.ProfitPerMonth.MonthlyProfits.Sum(x => x.Profit);
 
-    // ---- Year tile data ----
+    // -------- Profit per Year --------
     var yearLabels = Model.ProfitPerYear.YearlyProfits.Select(y => y.Year.ToString()).ToList();
     var yearValues = Model.ProfitPerYear.YearlyProfits.Select(y => y.Profit).ToList();
 
@@ -27,114 +40,197 @@
     var yearTotal = Model.ProfitPerYear.YearlyProfits.Sum(x => x.Profit);
 }
 
+
+
 <div class="container mt-4">
-    <h2 class="mb-3">Dashboard</h2>
+    <h2 class="mb-4 fw-bold">Dashboard</h2>
 
-    <!-- Row 1: Profit per month -->
-    <div class="row g-4">
-        <div class="col-12 col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <div class="d-flex align-items-start justify-content-between">
-                        <div>
-                            <h4 class="mb-1">Profit per month</h4>
-                            <div class="text-muted">Current year: <strong>@Model.ProfitPerMonth.Year</strong></div>
-                        </div>
-                        <div class="text-end">
-                            <div class="text-muted small">Total</div>
-                            <div class="fs-4 fw-semibold">@monthTotal.ToString("N2")</div>
-                        </div>
-                    </div>
+    <!-- ====================== -->
+    <!-- Units Monthly Balances -->
+    <!-- ====================== -->
+    <div class="dash-section">
 
-                    <hr class="my-3" />
+        <div class="dash-section-header">
+            <div>
+                <h3 class="dash-section-title">Units balances</h3>
+                <div class="dash-section-subtitle">
+                    @FullMonthName(unitsMonth) <strong>@unitsYear</strong>
+                </div>
+            </div>
 
-                    <div style="height: 320px;">
-                        <canvas id="profitPerMonthChart"></canvas>
-                    </div>
+            <div class="text-end">
+                @{
+                    var performanceClass = unitsTotalAmount >= unitsTotalRent ? "text-success" : "text-danger";
+                }
+                <div class="kpi-box">                 
+                    <div class="kpi-value @performanceClass">@unitsTotalAmount.ToString("N2")</div>
+                    <div class="kpi-label">Total amount</div>
+                </div>
+               
+                <div class="kpi-box">
+                   
+                    <div class="kpi-value">@unitsTotalRent.ToString("N2")</div>
+                    <div class="kpi-label">Total rent</div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-lg-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="mb-3">Breakdown</h5>
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Month</th>
-                                    <th class="text-end">Profit</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var m in Model.ProfitPerMonth.MonthlyProfits)
-                                {
+        @if (!unitRows.Any())
+        {
+            <div class="text-muted">No units found for this period.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Apartment</th>
+                            <th class="text-end">Rent price</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in unitRows)
+                        {
+                            var amountClass = r.Amount < 0
+                            ? "text-danger"
+                            : (r.Amount > 0 ? "text-success" : "text-muted");
+
+                            <tr>
+                                <td class="fw-semibold">@r.Apartment</td>
+                                <td class="text-end">@r.RentPrice.ToString("N2")</td>
+                                <td class="text-end @amountClass">
+                                    @r.Amount.ToString("N2")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <!-- ====================== -->
+    <!-- Profit Per Month -->
+    <!-- ====================== -->
+    <div class="dash-section">
+
+        <div class="dash-section-header">
+            <div>
+                <h3 class="dash-section-title">Profit per month</h3>
+                <div class="dash-section-subtitle">
+                    Current year: <strong>@Model.ProfitPerMonth.Year</strong>
+                </div>
+            </div>
+
+            <div class="text-end">
+                <div class="kpi-box">                
+                    <div class="kpi-value">@monthTotal.ToString("N2")</div>
+                    <div class="kpi-label">Total</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <div style="height: 320px;">
+                            <canvas id="profitPerMonthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="mb-3">Breakdown</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
                                     <tr>
-                                        <td>@MonthName(m.Month)</td>
-                                        <td class="text-end">@m.Profit.ToString("N2")</td>
+                                        <th>Month</th>
+                                        <th class="text-end">Profit</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach (var m in Model.ProfitPerMonth.MonthlyProfits)
+                                    {
+                                        <tr>
+                                            <td>@MonthName(m.Month)</td>
+                                            <td class="text-end">@m.Profit.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Row 2: Profit per year -->
-    <div class="row g-4 mt-1">
-        <div class="col-12 col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <div class="d-flex align-items-start justify-content-between">
-                        <div>
-                            <h4 class="mb-1">Profit per year</h4>
-                            <div class="text-muted">All years</div>
-                        </div>
-                        <div class="text-end">
-                            <div class="text-muted small">Total</div>
-                            <div class="fs-4 fw-semibold">@yearTotal.ToString("N2")</div>
-                        </div>
-                    </div>
+    <!-- ====================== -->
+    <!-- Profit Per Year -->
+    <!-- ====================== -->
+    <div class="dash-section">
 
-                    <hr class="my-3" />
+        <div class="dash-section-header">
+            <div>
+                <h3 class="dash-section-title">Profit per year</h3>
+                <div class="dash-section-subtitle">All years</div>
+            </div>
 
-                    <div style="height: 320px;">
-                        <canvas id="profitPerYearChart"></canvas>
-                    </div>
+            <div class="text-end">
+                <div class="kpi-box">
+                    <div class="kpi-value">@yearTotal.ToString("N2")</div>
+                    <div class="kpi-label">Total</div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-lg-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="mb-3">Breakdown</h5>
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Year</th>
-                                    <th class="text-end">Profit</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var y in Model.ProfitPerYear.YearlyProfits)
-                                {
+        <div class="row g-4">
+            <div class="col-12 col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <div style="height: 320px;">
+                            <canvas id="profitPerYearChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="mb-3">Breakdown</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
                                     <tr>
-                                        <td>@y.Year</td>
-                                        <td class="text-end">@y.Profit.ToString("N2")</td>
+                                        <th>Year</th>
+                                        <th class="text-end">Profit</th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach (var y in Model.ProfitPerYear.YearlyProfits)
+                                    {
+                                        <tr>
+                                            <td>@y.Year</td>
+                                            <td class="text-end">@y.Profit.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 
 @section Scripts {
@@ -152,18 +248,14 @@
                 type: 'bar',
                 data: {
                     labels: monthLabels,
-                    datasets: [{ label: 'Profit', data: monthValues, borderWidth: 1 }]
+                    datasets: [{ data: monthValues }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            ticks: {
-                                callback: (v) => Number(v).toLocaleString()
-                            }
-                        }
+                        y: { ticks: { callback: v => Number(v).toLocaleString() } }
                     }
                 }
             });
@@ -175,18 +267,14 @@
                 type: 'bar',
                 data: {
                     labels: yearLabels,
-                    datasets: [{ label: 'Profit', data: yearValues, borderWidth: 1 }]
+                    datasets: [{ data: yearValues }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            ticks: {
-                                callback: (v) => Number(v).toLocaleString()
-                            }
-                        }
+                        y: { ticks: { callback: v => Number(v).toLocaleString() } }
                     }
                 }
             });
