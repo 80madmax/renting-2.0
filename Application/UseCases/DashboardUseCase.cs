@@ -64,5 +64,25 @@ namespace Application.UseCases
                 UnitsMonthlyBalances = unitsMonthlyBalances
             };
         }
+
+        public async Task<UnitsROIDTO> GetUnitsROI()
+        {
+            var items = await _dashboardRepository.GetUnitsROI();
+
+            return new UnitsROIDTO
+            {
+                Items = items
+            };
+        }
+
+        public async Task<PortfolioROIDTO> GetPortfolioRoiDashboard()
+        {
+            var data = await _dashboardRepository.GetPortfolioRoi();
+
+            return new PortfolioROIDTO
+            {
+                Data = data
+            };
+        }
     }
 }

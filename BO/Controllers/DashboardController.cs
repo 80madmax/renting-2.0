@@ -23,12 +23,17 @@ namespace BO.Controllers
 
             var unitsMonthlyBalances = await _dashboardUseCase.GetUnitsMonthlyBalanceDashboard();
 
+            var unitsROI = await _dashboardUseCase.GetUnitsROI();
+
+            var portfolioRoi = await _dashboardUseCase.GetPortfolioRoiDashboard();
+
             var vm = new DashboardViewModel
             {
                 ProfitPerMonth = profitPerMonth,
                 ProfitPerYear = profitPerYear,
-                UnitsMonthlyBalances = unitsMonthlyBalances
-
+                UnitsMonthlyBalances = unitsMonthlyBalances,
+                UnitsROI = unitsROI,
+                PortfolioRoi = portfolioRoi
             };
 
             return View(vm);

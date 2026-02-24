@@ -13,5 +13,7 @@ namespace Application.UseCases
         Task<ProfitPerMonthDashboardDTO> GetProfitPerMonthDashboard();
         Task<ProfitPerYearDashboardDTO> GetProfitPerYearDashboard();
         Task<UnitMonthlyBalanceDTO> GetUnitsMonthlyBalanceDashboard();
+        Task<UnitsROIDTO> GetUnitsROI();
+        Task<PortfolioROIDTO> GetPortfolioRoiDashboard();
     }
 }

@@ -83,5 +83,44 @@ namespace Infrastructure.Repositories
 
             return result;
         }
+
+        public async Task<IReadOnlyList<UnitROI>> GetUnitsROI()
+        {
+            var rows = await _context.Units
+            .AsNoTracking()
+            .Select(u => new
+            {             
+                u.Name,
+                u.Cost,
+                Returned = u.Transactions
+                    .Sum(t => (decimal?)t.Amount) ?? 0m
+            })
+            .ToListAsync();
+
+            // C#: compute ROI + map + sort
+            return rows
+                .Select(x =>
+                {
+                    var roi = x.Cost <= 0m ? 0m : (x.Returned / x.Cost) * 100m;
+                    return new UnitROI(x.Name, roi);
+                })
+                .OrderByDescending(x => x.RoiPercent)
+                .ToList();
+        }
+
+        public async Task<PortfolioROI> GetPortfolioRoi()
+        {
+            // Total cost of all properties
+            var totalCost = await _context.Units
+                .AsNoTracking()
+                .SumAsync(u => (decimal?)u.Cost) ?? 0m;
+
+            // Total net of all transactions (positive + negative)
+            var totalNet = await _context.Transactions
+                .AsNoTracking()
+                .SumAsync(t => (decimal?)t.Amount) ?? 0m;
+
+            return new PortfolioROI(totalCost, totalNet);
+        }
     }
 }

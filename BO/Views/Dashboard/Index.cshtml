@@ -38,9 +38,85 @@
     var yearValuesJson = JsonSerializer.Serialize(yearValues);
 
     var yearTotal = Model.ProfitPerYear.YearlyProfits.Sum(x => x.Profit);
+
+    // -------- ROI per Property --------
+    var roiItems = (Model.UnitsROI?.Items ?? new List<Core.ReadModels.UnitROI>())
+        .OrderByDescending(x => x.RoiPercent)
+        .Take(50)
+        .ToList();
+
+    var roiLabels = roiItems.Select(x => x.Unit).ToList();
+    var roiValues = roiItems.Select(x => Math.Round((double)x.RoiPercent, 1)).ToList();
+
+    var roiLabelsJson = JsonSerializer.Serialize(roiLabels);
+    var roiValuesJson = JsonSerializer.Serialize(roiValues);
+
+    var roiChartHeightPx = Math.Max(360, roiItems.Count * 18);
+
+    // -------- Portfolio Total ROI (SEPARATE TILE) --------
+    // Expected: Model.PortfolioROI.Data.TotalCost / TotalNet (adjust names if yours differ)
+    var portfolio = Model.PortfolioRoi?.Data;
+
+    var totalCost = portfolio?.TotalCost ?? 0m;
+    var totalNet = portfolio?.TotalNet ?? 0m;
+
+    var totalRoiPercent = totalCost <= 0m ? 0d : (double)Math.Round((totalNet / totalCost) * 100m, 1);
+
+    var roiColorClass = totalRoiPercent >= 100 ? "text-success" : "text-danger";
+    var progress = Math.Max(0, Math.Min(100, totalRoiPercent)); // clamp 0..100
+    var aboveBreakEven = totalRoiPercent > 100 ? totalRoiPercent - 100 : 0;
 }
 
+<style>
+    .dash-section {
+        background: #f8f9fa;
+        border: 1px solid rgba(0,0,0,.06);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 24px;
+    }
 
+    .dash-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 18px;
+        gap: 16px;
+    }
+
+    .dash-section-title {
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .dash-section-subtitle {
+        color: #6c757d;
+        font-size: .95rem;
+    }
+
+    .kpi-box {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 14px;
+        padding: 12px 18px;
+        display: inline-block;
+        min-width: 170px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        margin-left: 10px;
+    }
+
+    .kpi-value {
+        font-size: 1.35rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .kpi-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 4px;
+    }
+</style>
 
 <div class="container mt-4">
     <h2 class="mb-4 fw-bold">Dashboard</h2>
@@ -62,13 +138,13 @@
                 @{
                     var performanceClass = unitsTotalAmount >= unitsTotalRent ? "text-success" : "text-danger";
                 }
-                <div class="kpi-box">                 
+
+                <div class="kpi-box">
                     <div class="kpi-value @performanceClass">@unitsTotalAmount.ToString("N2")</div>
                     <div class="kpi-label">Total amount</div>
                 </div>
-               
+
                 <div class="kpi-box">
-                   
                     <div class="kpi-value">@unitsTotalRent.ToString("N2")</div>
                     <div class="kpi-label">Total rent</div>
                 </div>
@@ -100,9 +176,7 @@
                             <tr>
                                 <td class="fw-semibold">@r.Apartment</td>
                                 <td class="text-end">@r.RentPrice.ToString("N2")</td>
-                                <td class="text-end @amountClass">
-                                    @r.Amount.ToString("N2")
-                                </td>
+                                <td class="text-end @amountClass">@r.Amount.ToString("N2")</td>
                             </tr>
                         }
                     </tbody>
@@ -125,7 +199,7 @@
             </div>
 
             <div class="text-end">
-                <div class="kpi-box">                
+                <div class="kpi-box">
                     <div class="kpi-value">@monthTotal.ToString("N2")</div>
                     <div class="kpi-label">Total</div>
                 </div>
@@ -231,6 +305,106 @@
         </div>
     </div>
 
+    <!-- ====================== -->
+    <!-- ROI Per Property -->
+    <!-- ====================== -->
+    <div class="dash-section">
+
+        <div class="dash-section-header">
+            <div>
+                <h3 class="dash-section-title">ROI by property</h3>
+                <div class="dash-section-subtitle">Sorted descending • Break-even at 100%</div>
+            </div>
+
+            <div class="text-end">
+                <div class="kpi-box">
+                    <div class="kpi-value">@roiItems.Count</div>
+                    <div class="kpi-label">Properties</div>
+                </div>
+            </div>
+        </div>
+
+        @if (!roiItems.Any())
+        {
+            <div class="text-muted">No ROI data available.</div>
+        }
+        else
+        {
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div style="height:@(roiChartHeightPx)px;">
+                        <canvas id="roiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- ====================== -->
+    <!-- Portfolio Total ROI (SEPARATE TILE UNDER ROI) -->
+    <!-- ====================== -->
+    <div class="dash-section">
+
+        <div class="dash-section-header">
+            <div>
+                <h3 class="dash-section-title">Portfolio ROI</h3>
+                <div class="dash-section-subtitle">Total net return vs total invested cost</div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+
+                <div class="row g-4 align-items-center">
+                    <div class="col-12 col-md-4">
+                        <div class="kpi-value @roiColorClass">@totalRoiPercent.ToString("N1")%</div>
+                        <div class="kpi-label">Total ROI</div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <div class="kpi-value">@totalNet.ToString("N2")</div>
+                        <div class="kpi-label">Total net returned</div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <div class="kpi-value">@totalCost.ToString("N2")</div>
+                        <div class="kpi-label">Total invested cost</div>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="small text-muted">Progress to break-even</span>
+                        <span class="small text-muted">100%</span>
+                    </div>
+
+                    <div class="progress" style="height: 14px;">
+                        <div class="progress-bar @(totalRoiPercent >= 100 ? "bg-success" : "bg-danger")"
+                             role="progressbar"
+                             style="width:@progress.ToString("N0")%;">
+                        </div>
+                    </div>
+
+                    @if (aboveBreakEven > 0)
+                    {
+                        <div class="text-success mt-3 fw-semibold">
+                            +@aboveBreakEven.ToString("N1")% above break-even
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-muted mt-3">
+                            @((100 - totalRoiPercent).ToString("N1"))% remaining to break-even
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @section Scripts {
@@ -239,44 +413,115 @@
         const monthLabels = @Html.Raw(monthLabelsJson);
         const monthValues = @Html.Raw(monthValuesJson);
 
-        const yearLabels  = @Html.Raw(yearLabelsJson);
-        const yearValues  = @Html.Raw(yearValuesJson);
+        const yearLabels = @Html.Raw(yearLabelsJson);
+        const yearValues = @Html.Raw(yearValuesJson);
 
+        const roiLabels = @Html.Raw(roiLabelsJson);
+        const roiValues = @Html.Raw(roiValuesJson);
+
+        // Profit per month chart
         const ctxMonth = document.getElementById('profitPerMonthChart');
         if (ctxMonth) {
             new Chart(ctxMonth, {
                 type: 'bar',
-                data: {
-                    labels: monthLabels,
-                    datasets: [{ data: monthValues }]
-                },
+                data: { labels: monthLabels, datasets: [{ data: monthValues }] },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: {
-                        y: { ticks: { callback: v => Number(v).toLocaleString() } }
-                    }
+                    scales: { y: { ticks: { callback: v => Number(v).toLocaleString() } } }
                 }
             });
         }
 
+        // Profit per year chart
         const ctxYear = document.getElementById('profitPerYearChart');
         if (ctxYear) {
             new Chart(ctxYear, {
                 type: 'bar',
-                data: {
-                    labels: yearLabels,
-                    datasets: [{ data: yearValues }]
-                },
+                data: { labels: yearLabels, datasets: [{ data: yearValues }] },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: {
-                        y: { ticks: { callback: v => Number(v).toLocaleString() } }
-                    }
+                    scales: { y: { ticks: { callback: v => Number(v).toLocaleString() } } }
                 }
+            });
+        }
+
+        // ROI chart colors:
+        // green when ROI >= 100%
+        // blue when ROI < 100%
+        // (optional) red when ROI < 0
+        const roiColors = roiValues.map(v =>
+            v >= 100 ? 'rgba(25,135,84,0.85)' : (v >= 0 ? 'rgba(13,110,253,0.75)' : 'rgba(220,53,69,0.80)')
+        );
+
+        // Plugin: vertical break-even line at 100%
+        const breakEvenLinePlugin = {
+            id: 'breakEvenLine',
+            afterDraw(chart, args, pluginOptions) {
+                const xValue = (pluginOptions && pluginOptions.xValue != null) ? pluginOptions.xValue : 100;
+
+                const xScale = chart.scales.x;
+                const yScale = chart.scales.y;
+                if (!xScale || !yScale) return;
+
+                const x = xScale.getPixelForValue(xValue);
+                const { top, bottom } = yScale;
+
+                const ctx = chart.ctx;
+                ctx.save();
+
+                ctx.beginPath();
+                ctx.moveTo(x, top);
+                ctx.lineTo(x, bottom);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'rgba(220,53,69,0.85)';
+                ctx.setLineDash([6, 6]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = 'rgba(220,53,69,0.95)';
+                ctx.font = '12px sans-serif';
+                ctx.fillText('100% break-even', x + 6, top + 14);
+
+                ctx.restore();
+            }
+        };
+
+        // ROI chart (horizontal bar)
+        const roiCanvas = document.getElementById('roiChart');
+        if (roiCanvas && roiValues && roiValues.length > 0) {
+            const minRoi = Math.min(...roiValues, 0);
+
+            new Chart(roiCanvas, {
+                type: 'bar',
+                data: {
+                    labels: roiLabels,
+                    datasets: [{
+                        data: roiValues,
+                        backgroundColor: roiColors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (ctx) => `${Number(ctx.raw).toFixed(1)}%` } },
+                        breakEvenLine: { xValue: 100 }
+                    },
+                    scales: {
+                        x: {
+                            suggestedMin: minRoi,
+                            ticks: { callback: (v) => v + '%' }
+                        }
+                    }
+                },
+                plugins: [breakEvenLinePlugin]
             });
         }
     </script>
