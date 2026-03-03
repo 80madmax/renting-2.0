@@ -46,6 +46,10 @@ builder.Services.AddScoped<ICommunalBillService, CommunalBillService>();
 builder.Services.AddScoped<ICommunalBillRepository, CommunalBillRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IDashboardUseCase, DashboardUseCase>();
+builder.Services.AddScoped<ITelegramTargetRepository, TelegramTargetRepository>();
+builder.Services.AddScoped<ITelegramMessageRepository, TelegramMessageRepository>();
+builder.Services.AddHttpClient<ITelegramNotifier, TelegramNotifier>();
+builder.Services.AddScoped<SendUnitExpenseTelegramMessage>();
 
 var app = builder.Build();
 

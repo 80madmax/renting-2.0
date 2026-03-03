@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Core.Interfaces
 {
-    public interface ITlegramNotifier
+    public interface ITelegramTargetRepository
     {
-        //Task<TelegramSendResult> SendAsync(TelegramSendRequest request, CancellationToken ct = default);
+        Task<long?> GetChatIdForUnitAsync(int itemId, CancellationToken ct = default);
     }
 }

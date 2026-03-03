@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Core.Models
 {
     public sealed record TelegramSendRequest(
-      string ChatId,                  // group chat id like "-1001234567890"
+      long ChatId,                  // group chat id like "-1001234567890"
       string Text,
       TelegramParseMode ParseMode = TelegramParseMode.PlainText
     );

@@ -9,8 +9,7 @@ namespace Core.Models
 {
     public class Unit : BaseModel
     {
-        public string TelegramChatId { get; set; }
-        public string TelegramBotToken { get; set; }
+        public long TelegramChatId { get; set; }     
         public string Address { get; set; }
         public int FloorID { get; set; }
         [ValidateNever]
