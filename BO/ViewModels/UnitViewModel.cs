@@ -58,6 +58,9 @@ namespace BO.ViewModels
         [Display(Name = "Renting Net Price")]
         public decimal RentPrice { get; set; } = 0;
 
+        [Display(Name = "Telegram Chat ID")]
+        public long Chat { get; set; } = 0;
+
         public int UserId { get; set; } = 2;
 
         public IEnumerable<SelectListItem>? Countries { get; set; }

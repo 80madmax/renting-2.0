@@ -26,17 +26,21 @@ namespace Infrastructure.Repositories
         {
             var url = $"https://api.telegram.org/bot{_token}/sendMessage";
 
-            var payload = new
+            var payload = new Dictionary<string, object>
             {
-                chat_id = request.ChatId,
-                text = request.Text,
-                parse_mode = request.ParseMode switch
-                {
-                    TelegramParseMode.Html => "HTML",
-                    TelegramParseMode.MarkdownV2 => "MarkdownV2",
-                    _ => null
-                }
+                ["chat_id"] = request.ChatId,
+                ["text"] = request.Text                
             };
+
+            var parse_mode = request.ParseMode switch
+            {
+                TelegramParseMode.Html => "HTML",
+                TelegramParseMode.MarkdownV2 => "MarkdownV2",
+                _ => null
+            };
+
+            if (parse_mode != null)
+                payload["parse_mode"] = parse_mode;
 
             var resp = await _http.PostAsJsonAsync(url, payload, ct);
 

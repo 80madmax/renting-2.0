@@ -1,4 +1,5 @@
-﻿using BO.ViewModels;
+﻿using Application.UseCases;
+using BO.ViewModels;
 using Core.Interfaces;
 using Core.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +16,15 @@ namespace BO.Controllers
         private readonly IUnitService _unitService;
         private readonly IFloorService _floorService;
         private readonly IUnitTypeService _unitTypeService;
+        private readonly SendUnitExpenseTelegramMessage _sendTelegram;
 
         public UnitController(ICountryService countryService,
                                   ICityService cityService,
                                   IDistrictService districtService,
                                   IUnitService unitService,
                                   IFloorService floorService,
-                                  IUnitTypeService unitTypeService)
+                                  IUnitTypeService unitTypeService,
+                                  SendUnitExpenseTelegramMessage sendTelegram)
         {
             _countryService = countryService;
             _cityService = cityService;
@@ -29,6 +32,7 @@ namespace BO.Controllers
             _unitService = unitService;
             _floorService = floorService;
             _unitTypeService = unitTypeService;
+            _sendTelegram = sendTelegram;
         }
 
         public async Task<IActionResult> Create()
@@ -103,7 +107,7 @@ namespace BO.Controllers
             {
                 Name = model.Name,
                 Address = model.Address,
-                TelegramChatId = 5155397675,             
+                TelegramChatId = model.Chat,             
                 DistrictID = model.DistrictId,
                 FloorID = model.FloorId,
                 UnitTypeId = model.UnitTypeId,
@@ -195,7 +199,8 @@ namespace BO.Controllers
                 CityName = unit.District?.City.Name ?? string.Empty,
                 CountryName = unit.District?.City.Country.Name ?? string.Empty,
                 Cost = unit.Cost,
-                RentPrice = unit.RentPrice,                   
+                RentPrice = unit.RentPrice,    
+                Chat = unit.TelegramChatId,
                 IsAvailable = unit.IsAvailable
                 
             };
@@ -251,6 +256,7 @@ namespace BO.Controllers
                 }),
                 Cost = unit.Cost,
                 RentPrice = unit.RentPrice,
+                Chat = unit.TelegramChatId,
                 IsAvailable = unit.IsAvailable
             };
 
@@ -297,7 +303,7 @@ namespace BO.Controllers
                 Id = model.Id,
                 Name = model.Name,
                 Address = model.Address,
-                TelegramChatId = 5155397675,
+                TelegramChatId = model.Chat,
                 DistrictID = model.DistrictId,
                 FloorID = model.FloorId,
                 UnitTypeId = model.UnitTypeId,
@@ -305,8 +311,8 @@ namespace BO.Controllers
                 IsAvailable = model.IsAvailable,
                 Cost = model.Cost,
                 RentPrice = model.RentPrice,
+                
                 UserId = model.UserId
-
             };
 
             await _unitService.UpdateAsync(unit);
@@ -331,6 +337,24 @@ namespace BO.Controllers
                Value = c.Id.ToString(),
                Text = c.Name
            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendTelegram(int unitId, int month, int year)
+        {
+            var result = await _sendTelegram.ExecuteAsync(unitId, month, year);
+
+            if (!result.Success)
+            {
+                TempData["Error"] = result.Error;
+            }
+            else
+            {
+                TempData["Success"] = "Telegram message sent successfully.";
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }
