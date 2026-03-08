@@ -30,14 +30,19 @@
         <dd class="col-sm-10">@Model.FloorName</dd>
 
         <dt class="col-sm-2">Unit Type</dt>
-        <dd class="col-sm-10">@Model.UnitTypeName</dd>     
-     
+        <dd class="col-sm-10">@Model.UnitTypeName</dd>         
 
         <dt class="col-sm-2">Cost</dt>
         <dd class="col-sm-10">@Model.Cost</dd>
 
         <dt class="col-sm-2">Rent Price</dt>
         <dd class="col-sm-10">@Model.RentPrice</dd>
+
+        <dt class="col-sm-2"><label asp-for="CorporateTax"></label></dt>
+        <dd class="col-sm-10">@Model.CorporateTax</dd>
+
+        <dt class="col-sm-2"><label asp-for="VatTax"></label></dt>
+        <dd class="col-sm-10">@Model.VatTax</dd>
 
         <dt class="col-sm-2">Telegram Chat ID</dt>
         <dd class="col-sm-10">@Model.Chat</dd>

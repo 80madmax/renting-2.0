@@ -54,7 +54,7 @@ namespace Infrastructure.Repositories
         }
 
         public async Task<IReadOnlyList<UnitMonthlyBalance>> GetUnitMonthlyBalance(int month, int year)
-        {
+        {            
             var rows = await _context.Units
             .AsNoTracking()
             .Select(u => new

@@ -67,57 +67,6 @@
     var aboveBreakEven = totalRoiPercent > 100 ? totalRoiPercent - 100 : 0;
 }
 
-<style>
-    .dash-section {
-        background: #f8f9fa;
-        border: 1px solid rgba(0,0,0,.06);
-        border-radius: 16px;
-        padding: 20px;
-        margin-bottom: 24px;
-    }
-
-    .dash-section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        margin-bottom: 18px;
-        gap: 16px;
-    }
-
-    .dash-section-title {
-        font-weight: 700;
-        margin: 0;
-    }
-
-    .dash-section-subtitle {
-        color: #6c757d;
-        font-size: .95rem;
-    }
-
-    .kpi-box {
-        background: #ffffff;
-        border: 1px solid rgba(0,0,0,0.08);
-        border-radius: 14px;
-        padding: 12px 18px;
-        display: inline-block;
-        min-width: 170px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-        margin-left: 10px;
-    }
-
-    .kpi-value {
-        font-size: 1.35rem;
-        font-weight: 800;
-        line-height: 1.2;
-    }
-
-    .kpi-label {
-        font-size: 0.85rem;
-        color: #6c757d;
-        margin-top: 4px;
-    }
-</style>
-
 <div class="container mt-4">
     <h2 class="mb-4 fw-bold">Dashboard</h2>
 
@@ -163,7 +112,7 @@
                         <tr>
                             <th>Apartment</th>
                             <th class="text-end">Rent price</th>
-                            <th class="text-end">Amount</th>
+                            <th class="text-end">Expenses & Taxes</th>
                         </tr>
                     </thead>
                     <tbody>

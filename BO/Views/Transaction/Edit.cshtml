@@ -47,6 +47,58 @@
     <div class="mt-3">
         <button type="submit" class="btn btn-primary">Save</button>
         <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        <button type="button" id="toggleTaxesBtn" class="btn btn-info">Show Taxes</button>
     </div>
 </form>
+
+<div id="taxesPanel" class="card mt-3" style="display: none;">
+    <div class="card-header">
+        <strong>Unit Taxes Reminder</strong>
+    </div>
+    <div class="card-body">
+        <div id="taxesPanelContent">
+            Loading taxes...
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {          
+
+            let taxesLoaded = false;
+
+            $('#toggleTaxesBtn').on('click', function () {
+                const panel = $('#taxesPanel');
+                const btn = $('#toggleTaxesBtn');
+
+                if (panel.is(':visible')) {
+                    panel.slideUp();
+                    btn.text('Show Taxes');
+                    return;
+                }
+
+                panel.slideDown();
+                btn.text('Hide Taxes');
+
+                if (!taxesLoaded) {
+                    $.ajax({
+                        url: '@Url.Action("GetUnitTaxesReminder", "Transaction")',
+                        type: 'GET',
+                        success: function (response) {
+                            $('#taxesPanelContent').html(response);
+                            taxesLoaded = true;
+                        },
+                        error: function () {
+                            $('#taxesPanelContent').html(
+                                '<div class="text-danger">Unable to load taxes reminder.</div>'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
 

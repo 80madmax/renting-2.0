@@ -1,0 +1,21 @@
+﻿@model IEnumerable<BO.ViewModels.UnitViewModel>
+
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Unit</th>
+            <th>Corporate Tax</th>
+            <th>VAT Tax</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var unit in Model)
+        {
+            <tr>
+                <td>@unit.Name</td>
+                <td>@unit.CorporateTax</td>
+                <td>@unit.VatTax</td>
+            </tr>
+        }
+    </tbody>
+</table>

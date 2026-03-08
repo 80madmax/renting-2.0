@@ -90,7 +90,7 @@ namespace BO.Controllers
                     PaymentId = model.PaymentId,
                     Year = model.Year,
                     Month = model.Month,
-                    Amount = (payment.PaymentType?.Id == 1) ? -model.Amount : model.Amount,                    
+                    Amount = (payment.PaymentType?.Id == 1 || payment.PaymentType?.Id == 3) ? -model.Amount : model.Amount,                    
                     Name = model.Note
                 };
 
@@ -100,7 +100,7 @@ namespace BO.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Index(TransactionFilterViewModel filter, int pageNumber = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(TransactionFilterViewModel filter, int pageNumber = 1, int pageSize = 50)
         {
             if (filter.IsInitialLoad)
             {
@@ -282,12 +282,26 @@ namespace BO.Controllers
                 Year = model.Year,
                 PaymentId = model.PaymentId,
                 UnitId = model.UnitId,
-                Amount = (payment.PaymentType?.Id == 1) ? -Math.Abs(model.Amount) : Math.Abs(model.Amount)   
+                Amount = (payment.PaymentType?.Id == 1 || payment.PaymentType?.Id == 3) ? -Math.Abs(model.Amount) : Math.Abs(model.Amount)   
                
             };
 
             await _transactionService.UpdateAsync(transaction);
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult GetUnitTaxesReminder()
+        {
+            var units = _unitService.GetAll()
+                .Select(u => new BO.ViewModels.UnitViewModel
+                {
+                    Name = u.Name,
+                    CorporateTax = u.CorporateTax,
+                    VatTax = u.VatTax
+                })
+                .ToList();
+
+            return PartialView("TaxesReminder", units);
         }
     }
 }

@@ -115,6 +115,8 @@ namespace BO.Controllers
                 IsAvailable = model.IsAvailable,
                 Cost = model.Cost,
                 RentPrice = model.RentPrice,
+                CorporateTax = model.CorporateTax,
+                VatTax = model.VatTax,
                 UserId = model.UserId
 
             };
@@ -199,7 +201,9 @@ namespace BO.Controllers
                 CityName = unit.District?.City.Name ?? string.Empty,
                 CountryName = unit.District?.City.Country.Name ?? string.Empty,
                 Cost = unit.Cost,
-                RentPrice = unit.RentPrice,    
+                RentPrice = unit.RentPrice,  
+                CorporateTax = unit.CorporateTax,
+                VatTax = unit.VatTax,
                 Chat = unit.TelegramChatId,
                 IsAvailable = unit.IsAvailable
                 
@@ -256,6 +260,8 @@ namespace BO.Controllers
                 }),
                 Cost = unit.Cost,
                 RentPrice = unit.RentPrice,
+                CorporateTax = unit.CorporateTax,
+                VatTax = unit.VatTax,
                 Chat = unit.TelegramChatId,
                 IsAvailable = unit.IsAvailable
             };
@@ -311,7 +317,8 @@ namespace BO.Controllers
                 IsAvailable = model.IsAvailable,
                 Cost = model.Cost,
                 RentPrice = model.RentPrice,
-                
+                CorporateTax = model.CorporateTax,
+                VatTax = model.VatTax,
                 UserId = model.UserId
             };
 

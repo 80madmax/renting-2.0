@@ -74,6 +74,18 @@
     </div>
 
     <div class="form-group">
+        <label asp-for="CorporateTax"></label>
+        <input name="CorporateTax" class="form-control" value="@Model.CorporateTax.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))" />
+        <span asp-validation-for="CorporateTax" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="VatTax"></label>
+        <input name="VatTax" class="form-control" value="@Model.VatTax.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))" />
+        <span asp-validation-for="VatTax" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
         <label asp-for="Chat"></label>
         <input asp-for="Chat" class="form-control" />
         <span asp-validation-for="Chat" class="text-danger"></span>

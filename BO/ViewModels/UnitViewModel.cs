@@ -61,6 +61,12 @@ namespace BO.ViewModels
         [Display(Name = "Telegram Chat ID")]
         public long Chat { get; set; } = 0;
 
+        [Display(Name = "Corporate Tax")]
+        public decimal CorporateTax { get; set; } = 0;
+
+        [Display(Name = "VAT Tax")]
+        public decimal VatTax { get; set; } = 0;
+
         public int UserId { get; set; } = 2;
 
         public IEnumerable<SelectListItem>? Countries { get; set; }

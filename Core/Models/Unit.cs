@@ -29,6 +29,10 @@ namespace Core.Models
 
         public decimal RentPrice { get; set; }
 
+        public decimal CorporateTax { get; set; } = 0;
+
+        public decimal VatTax { get; set; } = 0;
+
         public int UserId { get; set; }
 
         public ICollection<Message> Messages { get; set; }

@@ -17,7 +17,7 @@ namespace BO.Controllers
             _paymentTypeService = paymentTypeService;
         }
 
-        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 2)
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
         {
             var paged = await _paymentService.GetPaginatedWithPaymentTypeAsync(pageNumber, pageSize);
 
@@ -65,7 +65,7 @@ namespace BO.Controllers
             var payment = new Payment
             {
                 Name = model.Name,
-                PaymentTypeId = model.PaymentTypeId
+                PaymentTypeId = model.PaymentTypeId              
             };
 
             await _paymentService.AddAsync(payment);
@@ -93,7 +93,7 @@ namespace BO.Controllers
             {
                 Id = payment.Id,
                 Name = payment.Name,
-                PaymentTypeId = payment.PaymentTypeId,
+                PaymentTypeId = payment.PaymentTypeId,           
                 PaymentTypes = paymentTypes.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),

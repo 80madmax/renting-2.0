@@ -22,14 +22,14 @@ namespace Infrastructure.Repositories
         public async Task<UnitExpenseSummary?> GetUnitExpenseSummaryAsync(
         int unitId, int month, int year, CancellationToken ct = default)
         {
-            const int EXPENSE_TYPE_ID = 1;
+            const int PAYMENT_TYPE_ID = 1;
 
             var rows = await _context.Transactions
                 .Where(t =>
                     t.UnitId == unitId &&
                     t.Month == month &&
                     t.Year == year &&
-                    t.Payment.PaymentTypeId == EXPENSE_TYPE_ID)
+                    t.Payment.PaymentTypeId == PAYMENT_TYPE_ID)
                 .Select(t => new
                 {
                     UnitName = t.Unit.Name,
