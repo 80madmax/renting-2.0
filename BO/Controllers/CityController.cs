@@ -18,7 +18,7 @@ namespace BO.Controllers
             _countryService = countryService;
         }
 
-        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 2)
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
         {
             var paged = await _cityService.GetPaginatedWithCountriesAsync(pageNumber, pageSize);
 
@@ -145,7 +145,16 @@ namespace BO.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            await _cityService.DeleteAsync(id);
+            try
+            {
+                await _cityService.DeleteAsync(id);
+                TempData["Success"] = "City deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Unable to delete city: {ex.Message}";
+            }
+
             return RedirectToAction(nameof(Index));
         }
     }

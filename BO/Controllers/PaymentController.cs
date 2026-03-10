@@ -147,10 +147,18 @@ namespace BO.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            await _paymentService.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
-        }
+            try
+            {
+                await _paymentService.DeleteAsync(id);
+                TempData["Success"] = "Payment deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                // consider logging in real code
+                TempData["Error"] = $"Unable to delete payment: {ex.Message}";
+            }
 
-        
+            return RedirectToAction(nameof(Index));
+        }        
     }
 }

@@ -90,7 +90,7 @@ namespace BO.Controllers
                     PaymentId = model.PaymentId,
                     Year = model.Year,
                     Month = model.Month,
-                    Amount = (payment.PaymentType?.Id == 1 || payment.PaymentType?.Id == 3) ? -model.Amount : model.Amount,                    
+                    Amount = (payment.PaymentType?.Id == 1 || payment.PaymentType?.Id == 3) ? -model.Amount : model.Amount,
                     Name = model.Note
                 };
 
@@ -105,7 +105,7 @@ namespace BO.Controllers
             if (filter.IsInitialLoad)
             {
                 filter.SelectedMonth ??= DateTime.Now.Month;
-                
+
                 filter.SelectedYear ??= DateTime.Now.Year;
 
             }
@@ -177,7 +177,7 @@ namespace BO.Controllers
                     Floor = t.Unit.Floor.Name,
                     Address = t.Unit.Address,
                     District = t.Unit.District.Name
-                    
+
                 }).ToList(),
 
                 PageIndex = paginated.PageIndex,
@@ -189,9 +189,20 @@ namespace BO.Controllers
 
 
 
+        [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            await _transactionService.DeleteAsync(id);
+            try
+            {
+                await _transactionService.DeleteAsync(id);
+                TempData["Success"] = "Transaction deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                // Log in real code
+                TempData["Error"] = $"Unable to delete transaction: {ex.Message}";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -203,7 +214,7 @@ namespace BO.Controllers
             var model = new TransactionViewModel
             {
                 Id = transaction.Id,
-                Name = transaction.Name,      
+                Name = transaction.Name,
                 UnitName = $"{transaction.Unit.Name} - {transaction.Unit.Floor.Name} - {transaction.Unit.Address} - {transaction.Unit.District.Name}",
                 PaymentName = $"{transaction.Payment.PaymentType.Name} - {transaction.Payment.Name}",
                 Amount = transaction.Amount,
@@ -263,12 +274,12 @@ namespace BO.Controllers
             return View(model);
         }
 
-        
+
         [HttpPost]
         public async Task<IActionResult> Edit(TransactionEditViewModel model)
         {
             if (!ModelState.IsValid)
-            {              
+            {
                 return View(model);
             }
 
@@ -282,8 +293,8 @@ namespace BO.Controllers
                 Year = model.Year,
                 PaymentId = model.PaymentId,
                 UnitId = model.UnitId,
-                Amount = (payment.PaymentType?.Id == 1 || payment.PaymentType?.Id == 3) ? -Math.Abs(model.Amount) : Math.Abs(model.Amount)   
-               
+                Amount = (payment.PaymentType?.Id == 1 || payment.PaymentType?.Id == 3) ? -Math.Abs(model.Amount) : Math.Abs(model.Amount)
+
             };
 
             await _transactionService.UpdateAsync(transaction);

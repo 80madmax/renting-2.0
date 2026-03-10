@@ -11,6 +11,22 @@
     <a asp-action="Create" class="btn btn-primary">Create New Communal Bill</a>
 </p>
 
+<!-- Feedback messages -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <!-- Filter form -->
 <form method="get" asp-action="Index" class="mb-4">
     <input type="hidden" asp-for="Filter.IsInitialLoad" value="false" />
@@ -53,7 +69,7 @@
             <th>@Html.DisplayNameFor(model => Model.CommunalBills[0].CommunalExpense)</th>           
             <th>@Html.DisplayNameFor(model => Model.CommunalBills[0].Month)</th>
             <th>@Html.DisplayNameFor(model => Model.CommunalBills[0].Year)</th>
-            <th>Actions</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -64,13 +80,13 @@
                 <td>@cb.CommunalExpense</td>
                 <td>@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(cb.Month)</td>
                 <td>@cb.Year</td>               
-                <td>
+                <td class="text-end">
                     <a asp-action="Edit" asp-route-id="@cb.Id" class="btn btn-warning btn-sm">Edit</a>
                     <a asp-action="Details" asp-route-id="@cb.Id" class="btn btn-info btn-sm">Details</a>
                     <button type="button"
                             class="btn btn-danger btn-sm"
                             data-bs-toggle="modal"
-                            data-bs-target="#deleteModal"
+                            data-bs-target="#deleteSimpleModal"
                             data-entity-id="@cb.Id"
                             data-entity-value="@cb.CommunalExpense">
                         Delete
@@ -108,11 +124,36 @@
     }
 </div>
 
-<!-- Delete Modal -->
-@await Html.PartialAsync("_DeleteModal", new DeleteModalViewModel
+<!-- Use the simple delete modal (matches other index pages) -->
+@await Html.PartialAsync("_DeleteSimpleModal", new DeleteModalViewModel
 {
     EntityName = "CommunalBill",
-    EntityValue = "", // JS will populate
-    EntityId = 0,     // JS will populate
+    EntityValue = "",
+    EntityId = 0,
     ActionUrl = Url.Action("Delete", "CommunalBill")
 })
+
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 4s for a nicer UX
+        (function () {
+            try {
+                var dismissAfter = 4000;
+                document.querySelectorAll('.alert-dismissible').forEach(function (el) {
+                    setTimeout(function () {
+                        if (window.bootstrap && bootstrap.Alert) {
+                            var a = bootstrap.Alert.getOrCreateInstance(el);
+                            a.close();
+                        } else {
+                            // fallback: remove element
+                            el.classList.remove('show');
+                            el.remove();
+                        }
+                    }, dismissAfter);
+                });
+            } catch (e) {
+                console && console.warn && console.warn('Auto-dismiss alerts failed', e);
+            }
+        })();
+    </script>
+}

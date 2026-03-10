@@ -10,29 +10,31 @@
     <a asp-action="Create" class="btn btn-primary">Create New City</a>
 </p>
 
+@await Html.PartialAsync("_FlashMessages")
+
 <table class="table">
     <thead>
-        <tr>         
+        <tr>
             <th>@Html.DisplayNameFor(m => m.Cities[0].Name)</th>
             <th>@Html.DisplayNameFor(m => m.Cities[0].CountryName)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var city in Model.Cities)
+        @foreach (var c in Model.Cities)
         {
-            <tr>              
-                <td>@city.Name</td>
-                <td>@city.CountryName</td>
+            <tr>
+                <td>@c.Name</td>
+                <td>@c.CountryName</td>
                 <td class="text-end">
-                    <a asp-action="Edit" asp-route-id="@city.Id" class="btn btn-warning btn-sm">Edit</a>
-                    <a asp-action="Details" asp-route-id="@city.Id" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-info btn-sm">Details</a>
                     <button type="button"
                             class="btn btn-danger btn-sm"
                             data-bs-toggle="modal"
-                            data-bs-target="#deleteModal"
-                            data-entity-id="@city.Id"
-                            data-entity-value="@city.Name">
+                            data-bs-target="#deleteSimpleModal"
+                            data-entity-id="@c.Id"
+                            data-entity-value="@c.Name">
                         Delete
                     </button>
                 </td>
@@ -53,8 +55,7 @@
     }
 </div>
 
-<!-- Include reusable delete modal -->
-@await Html.PartialAsync("_DeleteModal", new BO.ViewModels.DeleteModalViewModel
+@await Html.PartialAsync("_DeleteSimpleModal", new BO.ViewModels.DeleteModalViewModel
 {
     EntityName = "City",
     EntityValue = "",

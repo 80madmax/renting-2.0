@@ -70,7 +70,7 @@ namespace BO.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(int? unitId, int pageNumber = 1, int pageSize = 2)
+        public async Task<IActionResult> Index(int? unitId, int pageNumber = 1, int pageSize = 20)
         {
             // Start with base query and include Unit navigation property
             var query = _messageService.GetAllWithUnits();
@@ -167,7 +167,17 @@ namespace BO.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            await _messageService.DeleteAsync(id);
+            try
+            {
+                await _messageService.DeleteAsync(id);
+                TempData["Success"] = "Message deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                // log in real code
+                TempData["Error"] = $"Unable to delete message: {ex.Message}";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

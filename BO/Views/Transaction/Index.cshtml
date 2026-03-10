@@ -11,6 +11,8 @@
     <a asp-action="Create" class="btn btn-primary">Create New Transaction</a>
 </p>
 
+@await Html.PartialAsync("_FlashMessages")
+
 <!-- Filter form -->
 <form method="get" asp-action="Index" class="mb-4">
     <input type="hidden" asp-for="Filter.IsInitialLoad" value="false" />
@@ -45,49 +47,54 @@
     </div>
 </form>
 
-<!-- Transactions table -->
-<table class="table">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => Model.Transactions[0].UnitName)</th>
-            <th>@Html.DisplayNameFor(model => Model.Transactions[0].Floor)</th>
-            <th>@Html.DisplayNameFor(model => Model.Transactions[0].Address)</th>
-            <th>@Html.DisplayNameFor(model => Model.Transactions[0].District)</th>
-            <th>@Html.DisplayNameFor(model => Model.Transactions[0].PaymentName)</th>
-            <th>@Html.DisplayNameFor(model => Model.Transactions[0].Month)</th>
-            <th>@Html.DisplayNameFor(model => Model.Transactions[0].Year)</th>
-            <th>@Html.DisplayNameFor(model => Model.Transactions[0].Amount)</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var t in Model.Transactions)
-        {
+<!-- Transactions table: responsive horizontal scroll for small screens -->
+<div class="table-responsive">
+    <table class="table">
+        <thead>
             <tr>
-                <td>@t.UnitName</td>
-                <td>@t.Floor</td>
-                <td>@t.Address</td>
-                <td>@t.District</td>
-                <td>@t.PaymentName</td>
-                <td>@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(t.Month)</td>
-                <td>@t.Year</td>
-                <td>@t.Amount.ToString("N2")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@t.Id" class="btn btn-warning btn-sm">Edit</a>
-                    <a asp-action="Details" asp-route-id="@t.Id" class="btn btn-info btn-sm">Details</a>
-                    <button type="button"
-                            class="btn btn-danger btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#deleteModal"
-                            data-entity-id="@t.Id"
-                            data-entity-value="@t.PaymentName">
-                        Delete
-                    </button>
-                </td>
+                <th>@Html.DisplayNameFor(model => Model.Transactions[0].UnitName)</th>
+                <th>@Html.DisplayNameFor(model => Model.Transactions[0].Floor)</th>
+                <th>@Html.DisplayNameFor(model => Model.Transactions[0].Address)</th>
+                <th>@Html.DisplayNameFor(model => Model.Transactions[0].District)</th>
+                <th>@Html.DisplayNameFor(model => Model.Transactions[0].PaymentName)</th>
+                <th>@Html.DisplayNameFor(model => Model.Transactions[0].Month)</th>
+                <th>@Html.DisplayNameFor(model => Model.Transactions[0].Year)</th>
+                <th>@Html.DisplayNameFor(model => Model.Transactions[0].Amount)</th>
+                <th>Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var t in Model.Transactions)
+            {
+                <tr>
+                    <td>@t.UnitName</td>
+                    <td>@t.Floor</td>
+                    <td>@t.Address</td>
+                    <td>@t.District</td>
+                    <td>@t.PaymentName</td>
+                    <td>@System.Globalization.CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(t.Month)</td>
+                    <td>@t.Year</td>
+                    <td>@t.Amount.ToString("N2")</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@t.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <a asp-action="Details" asp-route-id="@t.Id" class="btn btn-info btn-sm">Details</a>
+                        <button type="button"
+                                class="btn btn-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal"
+                                data-entity-id="@t.Id"
+                                data-entity-value="@t.PaymentName"
+                                data-unit-name="@t.UnitName"
+                                data-unit-floor="@t.Floor"
+                                data-unit-address="@t.Address">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 <!-- Pagination -->
 <div>

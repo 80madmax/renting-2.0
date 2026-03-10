@@ -105,14 +105,12 @@ namespace BO.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Index(CommunalBillFilterViewModel filter, int pageNumber = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(CommunalBillFilterViewModel filter, int pageNumber = 1, int pageSize = 20)
         {
             if (filter.IsInitialLoad)
             {
                 filter.SelectedMonth ??= DateTime.Now.Month;
-
                 filter.SelectedYear ??= DateTime.Now.Year;
-
             }
 
             // Map the filter to domain filter
@@ -173,12 +171,11 @@ namespace BO.Controllers
 
                 CommunalBills = paginated.Items.Select(t => new CommunalBillViewModel
                 {
-                    Id = t.Id,                  
+                    Id = t.Id,
                     Month = t.Month,
                     Year = t.Year,
                     CommunalExpense = t.CommunalExpense.Name,
                     Unit = $"{ t.Unit.Name + "," + t.Unit.Floor.Name + "," + t.Unit.Address + "," + t.Unit.District.Name}"
-
                 }).ToList(),
 
                 PageIndex = paginated.PageIndex,
@@ -188,12 +185,23 @@ namespace BO.Controllers
             return View(viewModel);
         }
 
+        [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            await _communalBillService.DeleteAsync(id);
+            try
+            {
+                await _communalBillService.DeleteAsync(id);
+                TempData["Success"] = "Communal bill deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                // Consider logging
+                TempData["Error"] = $"Unable to delete communal bill: {ex.Message}";
+            }
+
             return RedirectToAction(nameof(Index));
         }
-        
+
         public async Task<IActionResult> Details(int id)
         {
             var communalBill = await _communalBillService.GetByIdWithDetails(id);
@@ -225,7 +233,7 @@ namespace BO.Controllers
                 UnitId = communalBill.UnitId,
                 CommunalExpenseId = communalBill.CommunalExpenseId,
                 Month = communalBill.Month,
-                Year = communalBill.Year,          
+                Year = communalBill.Year,
                 Units = units.Select(u => new SelectListItem
                 {
                     Value = u.Id.ToString(),

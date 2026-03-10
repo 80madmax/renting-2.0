@@ -9,7 +9,21 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete <strong id="entityValue">@Model.EntityValue</strong>?
+                    <p>Are you sure you want to delete <strong id="entityValue">@Model.EntityValue</strong>?</p>
+
+                    <div class="mt-3">
+                        <small class="text-muted">Unit details:</small>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Unit</dt>
+                            <dd class="col-sm-8" id="entityUnit">-</dd>
+
+                            <dt class="col-sm-4">Floor</dt>
+                            <dd class="col-sm-8" id="entityFloor">-</dd>
+
+                            <dt class="col-sm-4">Address</dt>
+                            <dd class="col-sm-8" id="entityAddress">-</dd>
+                        </dl>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -21,15 +35,33 @@
 </div>
 
 <script>
-    const deleteModal = document.getElementById('deleteModal');
-    deleteModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const entityId = button.getAttribute('data-entity-id');
-        const entityValue = button.getAttribute('data-entity-value');
-        const form = deleteModal.querySelector('#deleteForm');
-        const nameDisplay = deleteModal.querySelector('#entityValue');
+    (function () {
+        const deleteModal = document.getElementById('deleteModal');
+        if (!deleteModal) return;
 
-        nameDisplay.textContent = entityValue;
-        form.action = '@Model.ActionUrl/' + entityId;
-    });
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const entityId = button.getAttribute('data-entity-id');
+            const entityValue = button.getAttribute('data-entity-value') || '';
+            const unitName = button.getAttribute('data-unit-name') || '';
+            const unitFloor = button.getAttribute('data-unit-floor') || '';
+            const unitAddress = button.getAttribute('data-unit-address') || '';
+
+            const form = deleteModal.querySelector('#deleteForm');
+            const nameDisplay = deleteModal.querySelector('#entityValue');
+            const unitDisplay = deleteModal.querySelector('#entityUnit');
+            const floorDisplay = deleteModal.querySelector('#entityFloor');
+            const addressDisplay = deleteModal.querySelector('#entityAddress');
+
+            nameDisplay.textContent = entityValue;
+            unitDisplay.textContent = unitName;
+            floorDisplay.textContent = unitFloor;
+            addressDisplay.textContent = unitAddress;
+
+            // Ensure actionUrl ends without slash before appending id
+            var base = '@Model.ActionUrl';
+            if (base.endsWith('/')) base = base.slice(0, -1);
+            form.action = base + '/' + entityId;
+        });
+    })();
 </script>

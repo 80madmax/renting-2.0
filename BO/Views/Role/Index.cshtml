@@ -12,6 +12,8 @@
     <a asp-action="Create" class="btn btn-primary">Create New Role</a>
 </p>
 
+@await Html.PartialAsync("_FlashMessages")
+
 <table class="table">
     <thead>
         <tr>         
@@ -30,7 +32,7 @@
                     <button type="button"
                             class="btn btn-danger btn-sm"
                             data-bs-toggle="modal"
-                            data-bs-target="#deleteModal"
+                            data-bs-target="#deleteSimpleModal"
                             data-entity-id="@role.Id"
                             data-entity-value="@role.Name">
                         Delete
@@ -53,10 +55,10 @@
     }
 </div>
 
-@await Html.PartialAsync("_DeleteModal", new DeleteModalViewModel
+@await Html.PartialAsync("_DeleteSimpleModal", new DeleteModalViewModel
 {
     EntityName = "Role",
-    EntityValue = "", // placeholder; JS sets it dynamically
-    EntityId = 0,     // placeholder; JS sets it dynamically
+    EntityValue = "",
+    EntityId = 0,
     ActionUrl = Url.Action("Delete", "Role")
 })

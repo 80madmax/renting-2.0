@@ -47,12 +47,19 @@
         <input asp-for="Note" class="form-control" />
     </div>
 
-    <button type="submit" class="btn btn-primary mt-2">Create</button>
-    <a asp-action="Index" class="btn btn-secondary mt-2">Back to List</a>
-    <button type="button" id="toggleTaxesBtn" class="btn btn-info mt-2">Show Taxes</button>
+    <div class="d-flex gap-2 mt-2">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+
+        <!-- Taxes toggle button placed next to other action buttons -->
+        <button type="button" id="toggleTaxesBtn" class="btn btn-info" aria-expanded="false" aria-controls="taxesPanel">
+            Show Taxes
+        </button>
+    </div>
 </form>
 
-<div id="taxesPanel" class="card mt-3" style="display: none;">
+<!-- Taxes reminder panel (initially hidden) -->
+<div id="taxesPanel" class="card mt-3" style="display: none;" role="region" aria-hidden="true">
     <div class="card-header">
         <strong>Unit Taxes Reminder</strong>
     </div>
@@ -67,6 +74,7 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
+            // Initialize select2
             $('.select2').select2({
                 placeholder: "Select units",
                 allowClear: true
@@ -81,15 +89,19 @@
                 if (panel.is(':visible')) {
                     panel.slideUp();
                     btn.text('Show Taxes');
+                    btn.attr('aria-expanded', 'false');
+                    panel.attr('aria-hidden', 'true');
                     return;
                 }
 
                 panel.slideDown();
                 btn.text('Hide Taxes');
+                btn.attr('aria-expanded', 'true');
+                panel.attr('aria-hidden', 'false');
 
                 if (!taxesLoaded) {
                     $.ajax({
-                        url: '@Url.Action("GetUnitTaxesReminder", "Transaction")', 
+                        url: '@Url.Action("GetUnitTaxesReminder", "Transaction")', // controller method (fake/demo endpoint)
                         type: 'GET',
                         success: function (response) {
                             $('#taxesPanelContent').html(response);

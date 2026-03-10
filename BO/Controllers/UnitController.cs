@@ -16,15 +16,13 @@ namespace BO.Controllers
         private readonly IUnitService _unitService;
         private readonly IFloorService _floorService;
         private readonly IUnitTypeService _unitTypeService;
-        private readonly SendUnitExpenseTelegramMessage _sendTelegram;
 
         public UnitController(ICountryService countryService,
                                   ICityService cityService,
                                   IDistrictService districtService,
                                   IUnitService unitService,
                                   IFloorService floorService,
-                                  IUnitTypeService unitTypeService,
-                                  SendUnitExpenseTelegramMessage sendTelegram)
+                                  IUnitTypeService unitTypeService)
         {
             _countryService = countryService;
             _cityService = cityService;
@@ -32,7 +30,6 @@ namespace BO.Controllers
             _unitService = unitService;
             _floorService = floorService;
             _unitTypeService = unitTypeService;
-            _sendTelegram = sendTelegram;
         }
 
         public async Task<IActionResult> Create()
@@ -118,10 +115,9 @@ namespace BO.Controllers
                 CorporateTax = model.CorporateTax,
                 VatTax = model.VatTax,
                 UserId = model.UserId
-
             };
 
-            await _unitService.AddAsync(unit);
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -181,7 +177,17 @@ namespace BO.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            await _unitService.DeleteAsync(id);
+            try
+            {
+                await _unitService.DeleteAsync(id);
+                TempData["Success"] = "Unit deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                // consider logging in real code
+                TempData["Error"] = $"Unable to delete unit: {ex.Message}";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -206,7 +212,6 @@ namespace BO.Controllers
                 VatTax = unit.VatTax,
                 Chat = unit.TelegramChatId,
                 IsAvailable = unit.IsAvailable
-                
             };
 
             return View(model);
@@ -322,7 +327,7 @@ namespace BO.Controllers
                 UserId = model.UserId
             };
 
-            await _unitService.UpdateAsync(unit);
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -346,22 +351,6 @@ namespace BO.Controllers
            });
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendTelegram(int unitId, int month, int year)
-        {
-            var result = await _sendTelegram.ExecuteAsync(unitId, month, year);
-
-            if (!result.Success)
-            {
-                TempData["Error"] = result.Error;
-            }
-            else
-            {
-                TempData["Success"] = "Telegram message sent successfully.";
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
+       
     }
 }

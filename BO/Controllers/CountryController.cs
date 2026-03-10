@@ -33,7 +33,7 @@ namespace BO.Controllers
         }
 
 
-        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 3)
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
         {
             var pagedResult = await _countryService.GetPaginatedAsync(pageNumber, pageSize);
 
@@ -102,7 +102,15 @@ namespace BO.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int Id)
         {
-            await _countryService.DeleteAsync(Id);
+            try
+            {
+                await _countryService.DeleteAsync(Id);
+                TempData["Success"] = "Country deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Unable to delete country: {ex.Message}";
+            }
 
             return RedirectToAction(nameof(Index));
         }

@@ -1,0 +1,157 @@
+@model BO.ViewModels.Reports.ExpensesIncomeViewModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Expenses / Income Report";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<!-- Filter form styled like Transaction/Index -->
+<form method="get" asp-action="ExpensesIncome" class="mb-4">
+    <!-- Preserve "isInitialLoad" flag so controller knows this is a postback and won't override user selection -->
+    <input type="hidden" name="isInitialLoad" value="false" />
+
+    <div class="row">
+        <div class="col-md-3">
+            <label>Unit</label>
+            <select asp-for="SelectedUnitId" asp-items="Model.Units" class="form-control">
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Month</label>
+            <select asp-for="SelectedMonth" asp-items="Model.Months" class="form-control">
+                <option value="">-- All Months --</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Year</label>
+            <select asp-for="SelectedYear" asp-items="Model.Years" class="form-control">
+                <option value="">-- All Years --</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
+
+@if (!Model.Rows.Any())
+{
+    <div class="alert alert-info">No data for selected period.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Selected Month</th>
+                    <th>Selected Year</th>
+                    <th>Unit</th>
+                    <th class="text-end">Unit Rent</th>
+                    <th class="text-end">Expenses</th>
+                    <th class="text-end">Taxes</th>
+                    <th class="text-end">Income</th>
+                    <th class="text-end">Balance</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Rows)
+                {
+                    <tr>
+                        <td>
+                            @(Model.SelectedMonth.HasValue
+                                ? CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(Model.SelectedMonth.Value)
+                                : "All")
+                        </td>
+                        <td>@(Model.SelectedYear.HasValue ? Model.SelectedYear.ToString() : "All")</td>
+                        <td>@row.UnitName</td>
+                        <td class="text-end">@row.UnitRent.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                        <td class="text-end">@row.Expenses.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                        <td class="text-end">@row.Taxes.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                        <td class="text-end">@row.Income.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                        <td class="text-end">@row.Balance.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                        <td class="text-end">
+                            <!-- Send button: opens modal and posts to UnitController.SendTelegram -->
+                            <button type="button"
+                                    class="btn btn-success btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#sendTelegramModalReports"
+                                    data-unit-id="@row.UnitId"
+                                    data-unit-name="@row.UnitName">
+                                Send
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="fw-bold">
+                    <td colspan="3" class="text-end">Totals:</td>
+                    <td class="text-end">@Model.Rows.Sum(r => r.UnitRent).ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                    <td class="text-end">@Model.Rows.Sum(r => r.Expenses).ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                    <td class="text-end">@Model.Rows.Sum(r => r.Taxes).ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                    <td class="text-end">@Model.Rows.Sum(r => r.Income).ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                    <td class="text-end">@Model.Rows.Sum(r => r.Balance).ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+}
+
+<!-- Send Telegram modal (mirrors Unit/Index behavior) -->
+<div class="modal fade" id="sendTelegramModalReports" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Send Telegram Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form method="post" asp-controller="Reports" asp-action="SendTelegram">
+                <div class="modal-body">
+                    <input type="hidden" name="unitId" id="reportsSendUnitId" />
+                    <input type="hidden" name="month" id="reportsSendMonth" value="@(Model.SelectedMonth ?? DateTime.Now.Month)" />
+                    <input type="hidden" name="year" id="reportsSendYear" value="@(Model.SelectedYear ?? DateTime.Now.Year)" />
+
+                    @* Return URL so after sending we come back to this report with current filters *@
+                    <input type="hidden" name="returnUrl" value='@Url.Action("ExpensesIncome", "Reports", new { SelectedMonth = Model.SelectedMonth, SelectedYear = Model.SelectedYear, SelectedUnitId = Model.SelectedUnitId, isInitialLoad = false })' />
+
+                    <p>
+                        Are you sure you want to send a Telegram message to
+                        <strong id="reportsSendUnitName"></strong>?
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Send</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- JS to populate modal fields (same approach as Unit/Index) -->
+<script>
+    var sendModalReports = document.getElementById('sendTelegramModalReports');
+    if (sendModalReports) {
+        sendModalReports.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var unitId = button.getAttribute('data-unit-id');
+            var unitName = button.getAttribute('data-unit-name');
+
+            // Set values in modal hidden inputs
+            document.getElementById('reportsSendUnitId').value = unitId;
+
+            // Use current model-selected month/year rendered into the page as defaults.
+            // They are set as the input values above; if you prefer to override with JS you can:
+            document.getElementById('reportsSendUnitName').textContent = unitName;
+        });
+    }
+</script>

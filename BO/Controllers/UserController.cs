@@ -91,7 +91,16 @@ namespace BO.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            await _userService.DeleteAsync(id);
+            try
+            {
+                await _userService.DeleteAsync(id);
+                TempData["Success"] = "User deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Unable to delete user: {ex.Message}";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

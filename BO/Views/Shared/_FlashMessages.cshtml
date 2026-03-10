@@ -1,0 +1,50 @@
+@*
+Reusable flash messages partial.
+Shows TempData["Success"] / TempData["Error"] as dismissible Bootstrap alerts
+and auto-closes them after a short delay.
+*@
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show flash-message" role="alert" data-flash-type="success">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show flash-message" role="alert" data-flash-type="error">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<script>
+    (function () {
+        try {
+            // Only run if there are flash messages on the page
+            var messages = document.querySelectorAll('.flash-message');
+            if (!messages || !messages.length) return;
+
+            var dismissAfter = 4000; // ms
+            messages.forEach(function (el) {
+                // if Bootstrap 5 Alert available use it to close, otherwise remove element
+                setTimeout(function () {
+                    try {
+                        if (window.bootstrap && bootstrap.Alert) {
+                            var inst = bootstrap.Alert.getOrCreateInstance(el);
+                            inst.close();
+                        } else {
+                            el.classList.remove('show');
+                            el.remove();
+                        }
+                    } catch (e) {
+                        // fallback remove
+                        el.remove();
+                    }
+                }, dismissAfter);
+            });
+        } catch (ex) {
+            console && console.warn && console.warn('Flash messages auto-dismiss failed', ex);
+        }
+    })();
+</script>

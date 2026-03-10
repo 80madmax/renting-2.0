@@ -101,7 +101,15 @@ namespace BO.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int Id)
         {
-            await _roleService.DeleteAsync(Id);
+            try
+            {
+                await _roleService.DeleteAsync(Id);
+                TempData["Success"] = "Role deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Unable to delete role: {ex.Message}";
+            }
 
             return RedirectToAction(nameof(Index));
         }

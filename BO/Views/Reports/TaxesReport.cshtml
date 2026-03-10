@@ -1,0 +1,71 @@
+@model BO.ViewModels.Reports.TaxesReportViewModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Taxes Report";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<!-- Filter form like Transaction/Index -->
+<form method="get" asp-action="TaxesReport" class="mb-4">
+    <input type="hidden" name="isInitialLoad" value="false" />
+
+    <div class="row">
+        <div class="col-md-3">
+            <label>Unit</label>
+            <select asp-for="SelectedUnitId" asp-items="Model.Units" class="form-control">
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Month</label>
+            <select asp-for="SelectedMonth" asp-items="Model.Months" class="form-control">
+                <option value="">-- All Months --</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Year</label>
+            <select asp-for="SelectedYear" asp-items="Model.Years" class="form-control">
+                <option value="">-- All Years --</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
+
+@if (!Model.Rows.Any())
+{
+    <div class="alert alert-info">No tax data for selected period.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Year</th>
+                    <th class="text-end">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model.Rows)
+                {
+                    <tr>
+                        <td>@CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(r.Month)</td>
+                        <td>@r.Year</td>
+                        <td class="text-end">@r.Total.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="fw-bold">
+                    <td colspan="2" class="text-end">Grand Total:</td>
+                    <td class="text-end">@Model.Rows.Sum(x => x.Total).ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+}

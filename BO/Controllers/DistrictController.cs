@@ -112,7 +112,16 @@ namespace BO.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            await _districtService.DeleteAsync(id);
+            try
+            {
+                await _districtService.DeleteAsync(id);
+                TempData["Success"] = "District deleted successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Unable to delete district: {ex.Message}";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
