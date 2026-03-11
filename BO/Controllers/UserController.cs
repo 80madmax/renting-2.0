@@ -1,12 +1,14 @@
 ﻿using BO.ViewModels;
 using Core.Interfaces;
 using Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Numerics;
 
 namespace BO.Controllers
 {
+    [Authorize(Roles = "Super Admin")]
     public class UserController : Controller
     {
         private readonly IUserService _userService;

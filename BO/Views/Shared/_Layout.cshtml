@@ -1,11 +1,24 @@
 ﻿@using System
 @using System.Linq
+@using System.Security.Claims
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery AntiForgery
+
+@functions {
+    // Helper used by navigation links to mark active controller(s)
+    private bool isActiveController(params string[] controllers)
+    {
+        var routeData = Context?.GetRouteData();
+        var current = (routeData?.Values["controller"] as string) ?? string.Empty;
+        return controllers.Any(c => string.Equals(current, c, StringComparison.OrdinalIgnoreCase));
+    }
+}
+
 <!DOCTYPE html>
 <html lang="bg">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BO</title>
+    <title>@ViewData["Title"] - Renting</title>
 
     <!-- Bootstrap CSS (local via LibMan) -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -17,27 +30,20 @@
     <!-- Select2 CSS via CDN -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
-<body>
+<body>      
     <header>
-        @{
-            var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
-            var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
-
-            var isActiveController = new Func<string, bool>(c => string.Equals(c, currentController, StringComparison.OrdinalIgnoreCase));
-            var isActive = new Func<string, string, bool>((c, a) => isActiveController(c) && string.Equals(a, currentAction, StringComparison.OrdinalIgnoreCase));
-            var isActiveAny = new Func<string[], bool>(arr => arr.Any(a => string.Equals(a, currentController, StringComparison.OrdinalIgnoreCase)));
-        }
-
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BO</a>
+                <a class="navbar-brand" asp-controller="Dashboard" asp-action="Index">Renting</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
                         aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
+                    @* MAIN NAVIGATION: menus + submenus *@
                     <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+
                         <li class="nav-item">
                             <a class="nav-link @(isActiveController("Dashboard") ? "active" : "")"
                                asp-controller="Dashboard" asp-action="Index">Dashboard</a>
@@ -48,94 +54,107 @@
                                asp-controller="Transaction" asp-action="Index">Transactions</a>
                         </li>
 
+                        @* Reports with submenus: Expenses & Incomes, Taxes *@
+                        @{
+                            var reportsActive = isActiveController("Reports", "ExpensesIncome", "TaxesReport");
+                        }
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle @(isActiveController("Reports") ? "active" : "")"
-                               href="#"
-                               id="reportsDropdown"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
+                            <a class="nav-link dropdown-toggle @(reportsActive ? "active" : "")"
+                               href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Reports
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
-                                <li>
-                                    <a class="dropdown-item @(isActive("Reports", "ExpensesIncome") ? "active" : "")"
-                                       asp-controller="Reports" asp-action="ExpensesIncome">Expenses / Income</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item @(isActive("Reports", "TaxesReport") ? "active" : "")"
-                                       asp-controller="Reports" asp-action="TaxesReport">Taxes</a>
-                                </li>
+                                <li><a class="dropdown-item" asp-controller="Reports" asp-action="ExpensesIncome">Expenses &amp; Incomes</a></li>
+                                <li><a class="dropdown-item" asp-controller="Reports" asp-action="TaxesReport">Taxes</a></li>
                             </ul>
                         </li>
 
+                        @* Reminders with sub items: Communal Bills, Messages *@
+                        @{
+                            var remindersActive = isActiveController("CommunalBill", "Message");
+                        }
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle @(isActiveAny(new[] { "Message", "CommunalBills" }) ? "active" : "")"
-                               href="#"
-                               id="remindersDropdown"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
+                            <a class="nav-link dropdown-toggle @(remindersActive ? "active" : "")"
+                               href="#" id="remindersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Reminders
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="remindersDropdown">
-                                <li>
-                                    @* Use the same tag-helper approach as Settings so URLs are generated correctly (absolute) *@
-                                    <a class="dropdown-item @(isActiveController("CommunalBill") ? "active" : "")"
-                                       asp-controller="CommunalBill" asp-action="Index">Communal Bills</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item @(isActiveController("Message") ? "active" : "")"
-                                       asp-controller="Message" asp-action="Index">Messages</a>
-                                </li>
+                                <li><a class="dropdown-item" asp-controller="CommunalBill" asp-action="Index">Communal Bills</a></li>
+                                <li><a class="dropdown-item" asp-controller="Message" asp-action="Index">Messages</a></li>
                             </ul>
                         </li>
 
+                        @* Settings - Units, Countries, Cities, Districts, Payments, Roles, Users *@
+                        @{
+                            var settingsActive = isActiveController("Unit", "Country", "City", "District", "Payment", "Role", "User", "PaymentType", "UnitType", "Floor");
+                        }
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle @(isActiveAny(new[] { "Unit", "Country", "City", "District", "Payment", "Role", "User" }) ? "active" : "")"
-                               href="#"
-                               id="settingsDropdown"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false">
+                            <a class="nav-link dropdown-toggle @(settingsActive ? "active" : "")"
+                               href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Settings
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="settingsDropdown">
-                                <li><a class="dropdown-item @(isActiveController("Unit") ? "active" : "")" asp-controller="Unit" asp-action="Index">Units</a></li>
-                                <li><a class="dropdown-item @(isActiveController("Country") ? "active" : "")" asp-controller="Country" asp-action="Index">Countries</a></li>
-                                <li><a class="dropdown-item @(isActiveController("City") ? "active" : "")" asp-controller="City" asp-action="Index">Cities</a></li>
-                                <li><a class="dropdown-item @(isActiveController("District") ? "active" : "")" asp-controller="District" asp-action="Index">Districts</a></li>
-                                <li><a class="dropdown-item @(isActiveController("Payment") ? "active" : "")" asp-controller="Payment" asp-action="Index">Payments</a></li>
-                                <li><a class="dropdown-item @(isActiveController("Role") ? "active" : "")" asp-controller="Role" asp-action="Index">Roles</a></li>
-                                <li><a class="dropdown-item @(isActiveController("User") ? "active" : "")" asp-controller="User" asp-action="Index">Users</a></li>
+                                <li><a class="dropdown-item" asp-controller="Unit" asp-action="Index">Units</a></li>
+                                <li><a class="dropdown-item" asp-controller="Country" asp-action="Index">Countries</a></li>
+                                <li><a class="dropdown-item" asp-controller="City" asp-action="Index">Cities</a></li>
+                                <li><a class="dropdown-item" asp-controller="District" asp-action="Index">Districts</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" asp-controller="Payment" asp-action="Index">Payments</a></li>
+                                @* Roles & Users links visible only to Super Admin *@
+                                @if (User?.IsInRole("Super Admin") == true)
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Role" asp-action="Index">Roles</a></li>
+                                    <li><a class="dropdown-item" asp-controller="User" asp-action="Index">Users</a></li>
+                                }
                             </ul>
                         </li>
+
                     </ul>
 
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark @(isActiveController("Home") ? "active" : "")" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-
-                        @* Authentication/account placeholders - replace with actual implementation later *@
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="#">Account</a>
-                        </li>
+                    <ul class="navbar-nav ms-auto">
+                        @if (User?.Identity?.IsAuthenticated == true)
+                        {
+                            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    @User.Identity?.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li class="dropdown-item-text">
+                                        <small class="text-muted">Role: @(!string.IsNullOrEmpty(role) ? role : "—")</small>
+                                    </li>
+                                    <li><a class="dropdown-item" asp-controller="User" asp-action="Details" asp-route-id="@userId">Profile</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="dropdown-item">Logout</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <div class="container mt-3">
+        @RenderBody()
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer mt-auto py-3 bg-light">
         <div class="container">
-            &copy; 2025 - BO - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <span class="text-muted">&copy; @(DateTime.Now.Year) Renting</span>
         </div>
     </footer>
 

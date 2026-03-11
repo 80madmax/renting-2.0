@@ -56,7 +56,7 @@
                     <button type="button"
                             class="btn btn-danger btn-sm"
                             data-bs-toggle="modal"
-                            data-bs-target="#deleteModal"
+                            data-bs-target="#deleteSimpleModal"
                             data-entity-id="@message.Id"
                             data-entity-value="@message.Text"
                             data-unit-name="@message.UnitName"
@@ -91,7 +91,7 @@
 </div>
 
 <!-- Use detailed delete modal so we can show unit context (floor/address left blank) -->
-@await Html.PartialAsync("_DeleteModal", new BO.ViewModels.DeleteModalViewModel
+@await Html.PartialAsync("_DeleteSimpleModal", new BO.ViewModels.DeleteModalViewModel
 {
     EntityName = "Message",
     EntityValue = "",

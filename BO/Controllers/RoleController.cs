@@ -1,10 +1,12 @@
 ﻿using BO.ViewModels;
 using Core.Interfaces;
 using Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BO.Controllers
 {
+    [Authorize(Roles = "Super Admin")]
     public class RoleController : Controller
     {
         private readonly IRoleService _roleService;
