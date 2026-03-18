@@ -19,11 +19,11 @@ namespace Infrastructure.Repositories
             _context = context;         
         }
 
-        public async Task<IReadOnlyList<MonthlyProfit>> GetProfitPerMonth(int year)
+        public async Task<IReadOnlyList<MonthlyProfit>> GetProfitPerMonth(int year, int loggedUserId)
         {
             var rows = await _context.Transactions
                                     .AsNoTracking()
-                                    .Where(t => t.Year == year)
+                                    .Where(t => t.Year == year && t.Unit.UserId == loggedUserId)
                                     .GroupBy(t => t.Month)
                                     .Select(g => new
                                     {
@@ -34,13 +34,13 @@ namespace Infrastructure.Repositories
                                     .ToListAsync();
 
             return rows.Select(x => new MonthlyProfit(x.Month, x.Profit)).ToList();
-
         }
 
-        public async Task<IReadOnlyList<YearlyProfit>> GetProfitPerYear()
+        public async Task<IReadOnlyList<YearlyProfit>> GetProfitPerYear(int loggedUserId)
         {
             var rows = await _context.Transactions
                                                 .AsNoTracking()
+                                                .Where(t => t.Unit.UserId == loggedUserId)
                                                 .GroupBy(t => t.Year)
                                                 .Select(g => new
                                                 {
@@ -53,10 +53,11 @@ namespace Infrastructure.Repositories
             return rows.Select(x => new YearlyProfit(x.Year, x.Profit)).ToList();
         }
 
-        public async Task<IReadOnlyList<UnitMonthlyBalance>> GetUnitMonthlyBalance(int month, int year)
+        public async Task<IReadOnlyList<UnitMonthlyBalance>> GetUnitMonthlyBalance(int month, int year, int loggedUserId)
         {            
             var rows = await _context.Units
             .AsNoTracking()
+            .Where(u => u.UserId == loggedUserId)
             .Select(u => new
             {
                 u.Name,
@@ -78,16 +79,17 @@ namespace Infrastructure.Repositories
                                 year: year,
                                 amount: x.Amount
                             ))
-                            .OrderBy(x => x.Apartment) // safe in memory
+                            .OrderBy(x => x.Apartment)
                             .ToList();
 
             return result;
         }
 
-        public async Task<IReadOnlyList<UnitROI>> GetUnitsROI()
+        public async Task<IReadOnlyList<UnitROI>> GetUnitsROI(int loggedUserId)
         {
             var rows = await _context.Units
             .AsNoTracking()
+            .Where(u => u.UserId == loggedUserId)
             .Select(u => new
             {             
                 u.Name,
@@ -97,7 +99,6 @@ namespace Infrastructure.Repositories
             })
             .ToListAsync();
 
-            // C#: compute ROI + map + sort
             return rows
                 .Select(x =>
                 {
@@ -108,16 +109,16 @@ namespace Infrastructure.Repositories
                 .ToList();
         }
 
-        public async Task<PortfolioROI> GetPortfolioRoi()
+        public async Task<PortfolioROI> GetPortfolioRoi(int loggedUserId)
         {
-            // Total cost of all properties
             var totalCost = await _context.Units
                 .AsNoTracking()
+                .Where(u => u.UserId == loggedUserId)
                 .SumAsync(u => (decimal?)u.Cost) ?? 0m;
 
-            // Total net of all transactions (positive + negative)
             var totalNet = await _context.Transactions
                 .AsNoTracking()
+                .Where(t => t.Unit.UserId == loggedUserId)
                 .SumAsync(t => (decimal?)t.Amount) ?? 0m;
 
             return new PortfolioROI(totalCost, totalNet);

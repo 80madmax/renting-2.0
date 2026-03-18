@@ -9,7 +9,7 @@ using System.Globalization;
 
 namespace BO.Controllers
 {
-    public class CommunalBillController : Controller
+    public class CommunalBillController : BaseController
     {
         private readonly ICommunalBillService _communalBillService;
         private readonly IUnitService _unitService;
@@ -126,7 +126,7 @@ namespace BO.Controllers
             var paginated = await _communalBillService.GetPaginatedWithFiltersAsync(filterEntity, pageNumber, pageSize);
 
             // Fetch dropdown sources
-            var units = await _unitService.GetAllWithDistrictCityFloor();
+            var units = await _unitService.GetAllWithDistrictCityFloor(LoggedUserIdAsInt);
             var communalExpense = await _communalExpenseService.GetAllOrdered();
 
             // Build view model
@@ -224,7 +224,7 @@ namespace BO.Controllers
             var communalBill = await _communalBillService.GetByIdAsync(id);
 
             // Fetch dropdown sources
-            var units = await _unitService.GetAllWithDistrictCityFloor();
+            var units = await _unitService.GetAllWithDistrictCityFloor(LoggedUserIdAsInt);
             var communalExpenses = await _communalExpenseService.GetAllOrdered();
 
             var model = new CommunalBillEditViewModel

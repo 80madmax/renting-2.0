@@ -9,7 +9,7 @@ using System.Globalization;
 
 namespace BO.Controllers
 {
-    public class TransactionController : Controller
+    public class TransactionController : BaseController
     {
         private readonly ITransactionService _transactionService;
         private readonly IUnitService _unitService;
@@ -44,7 +44,7 @@ namespace BO.Controllers
                     Text = $"{ p.PaymentType.Name } - {p.Name}"
                 }),
 
-                Years = Enumerable.Range(now.Year - 5, 11).Select(y => new SelectListItem
+                Years = Enumerable.Range(now.Year - 9, 15).Select(y => new SelectListItem
                 {
                     Value = y.ToString(),
                     Text = y.ToString()
@@ -69,7 +69,7 @@ namespace BO.Controllers
                 // Reload dropdowns
                 model.Units = _unitService.GetAll().Select(u => new SelectListItem { Value = u.Id.ToString(), Text = u.Name });
                 model.Payments = _paymentService.GetAll().Select(p => new SelectListItem { Value = p.Id.ToString(), Text = p.Name });
-                model.Years = Enumerable.Range(DateTime.Now.Year - 5, 11).Select(y => new SelectListItem { Value = y.ToString(), Text = y.ToString() });
+                model.Years = Enumerable.Range(DateTime.Now.Year - 9, 15).Select(y => new SelectListItem { Value = y.ToString(), Text = y.ToString() });
                 model.Months = Enumerable.Range(1, 12).Select(m => new SelectListItem
                 {
                     Value = m.ToString(),
@@ -90,7 +90,8 @@ namespace BO.Controllers
                     PaymentId = model.PaymentId,
                     Year = model.Year,
                     Month = model.Month,
-                    Amount = (payment.PaymentType?.Id == 1 || payment.PaymentType?.Id == 3) ? -model.Amount : model.Amount,
+                    Amount = (payment.PaymentType?.Id == 1 || payment.PaymentType?.Id == 3 
+                           || payment.PaymentType.Id == 4 || payment.PaymentType?.Id == 5) ? -model.Amount : model.Amount,
                     Name = model.Note
                 };
 
@@ -120,10 +121,10 @@ namespace BO.Controllers
             };
 
             // Get paginated, filtered result
-            var paginated = await _transactionService.GetPaginatedWithFiltersAsync(filterEntity, pageNumber, pageSize);
+            var paginated = await _transactionService.GetPaginatedWithFiltersAsync(filterEntity, pageNumber, pageSize, LoggedUserIdAsInt);
 
             // Fetch dropdown sources
-            var units = await _unitService.GetAllWithDistrictCityFloor();
+            var units = await _unitService.GetAllWithDistrictCityFloor(LoggedUserIdAsInt);
             var payments = await _paymentService.GetAllOrderedByType();
 
             // Build view model
@@ -151,7 +152,7 @@ namespace BO.Controllers
                         Selected = (m == filter.SelectedMonth)
                     }),
 
-                    Years = Enumerable.Range(DateTime.Now.Year - 5, 10).Select(y => new SelectListItem
+                    Years = Enumerable.Range(DateTime.Now.Year - 9, 15).Select(y => new SelectListItem
                     {
                         Value = y.ToString(),
                         Text = y.ToString(),
@@ -234,7 +235,7 @@ namespace BO.Controllers
             var transaction = await _transactionService.GetByIdAsync(id);
 
             // Fetch dropdown sources
-            var units = await _unitService.GetAllWithDistrictCityFloor();
+            var units = await _unitService.GetAllWithDistrictCityFloor(LoggedUserIdAsInt);
             var payments = await _paymentService.GetAllOrderedByType();
 
             var model = new TransactionEditViewModel
@@ -258,7 +259,7 @@ namespace BO.Controllers
                     Text = $"{p.PaymentType.Name} - {p.Name}"
                 }),
 
-                Years = Enumerable.Range(DateTime.Now.Year - 5, 11).Select(y => new SelectListItem
+                Years = Enumerable.Range(DateTime.Now.Year - 9, 15).Select(y => new SelectListItem
                 {
                     Value = y.ToString(),
                     Text = y.ToString()
@@ -293,7 +294,8 @@ namespace BO.Controllers
                 Year = model.Year,
                 PaymentId = model.PaymentId,
                 UnitId = model.UnitId,
-                Amount = (payment.PaymentType?.Id == 1 || payment.PaymentType?.Id == 3) ? -Math.Abs(model.Amount) : Math.Abs(model.Amount)
+                Amount = (payment.PaymentType?.Id == 1 || payment.PaymentType?.Id == 3
+                        || payment.PaymentType.Id == 4 || payment.PaymentType?.Id == 5) ? -Math.Abs(model.Amount) : Math.Abs(model.Amount)
 
             };
 

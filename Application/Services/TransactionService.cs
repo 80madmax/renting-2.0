@@ -53,14 +53,19 @@ namespace Application.Services
             return await _transactionRepository.GetPaginatedWithFiltersAsync(filter, pageNumber, pageSize);
         }
 
-        public async Task<IEnumerable<Transaction>> GetFilteredTransactions(TransactionFilter filter)
+        public async Task<IEnumerable<Transaction>> GetFilteredTransactions(TransactionFilter filter, int loggedUserId)
         {
-            return await _transactionRepository.GetFilteredTransactions(filter);
+            return await _transactionRepository.GetFilteredTransactions(filter, loggedUserId);
         }
 
         public async Task<Transaction> GetByIdWithDetails(int id)
         {
             return await _transactionRepository.GetByIdWithDetails(id);
+        }
+
+        public async Task<IPaginatedList<Transaction>> GetPaginatedWithFiltersAsync(TransactionFilter filter, int pageNumber, int pageSize, int loggedUserId)
+        {
+            return await _transactionRepository.GetPaginatedWithFiltersAsync(filter, pageNumber, pageSize, loggedUserId);
         }
     }
 }

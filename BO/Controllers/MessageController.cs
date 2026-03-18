@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BO.Controllers
 {
-    public class MessageController : Controller
+    public class MessageController : BaseController
     {
         private readonly IUnitService _unitService;
         private readonly IMessageService _messageService;
@@ -25,7 +25,7 @@ namespace BO.Controllers
 
         public async Task<IActionResult> Create()
         {
-            var units = _unitService.GetAll();
+            var units = await _unitService.GetAllWithDistrictCityFloor(LoggedUserIdAsInt);
 
             var model = new MessageCreateViewModel
             {
@@ -45,7 +45,7 @@ namespace BO.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var units = _unitService.GetAll();
+                var units = await _unitService.GetAllWithDistrictCityFloor(LoggedUserIdAsInt);
                 model.Units = units.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
@@ -84,6 +84,9 @@ namespace BO.Controllers
             // Apply pagination
             var paginated = await PaginationHelper.ToPaginatedListAsync(query, pageNumber, pageSize);
 
+            // Get units for dropdown
+            var units = await _unitService.GetAllWithDistrictCityFloor(LoggedUserIdAsInt);
+
             // Map to view model
             var model = new MessageListViewModel
             {
@@ -96,10 +99,10 @@ namespace BO.Controllers
                     Text = m.Name,
                     UnitName = m.Unit?.Name ?? "(No Unit)"
                 }).ToList(),
-                Units = (_unitService.GetAll()).Select(u => new SelectListItem
+                Units = units.Select(u => new SelectListItem
                 {
                     Value = u.Id.ToString(),
-                    Text = u.Name
+                    Text = u.Name + " - " + u.Floor.Name + " - " + u.Address + " - " + u.District.Name
                 })
             };
 
@@ -126,7 +129,7 @@ namespace BO.Controllers
             var message = await _messageService.GetByIdAsync(id);
             if (message == null) return NotFound();
 
-            var units = _unitService.GetAll();
+            var units = await _unitService.GetAllWithDistrictCityFloor(LoggedUserIdAsInt);
           
             var model = new MessageEditViewModel
             {
@@ -136,7 +139,7 @@ namespace BO.Controllers
                 Units = units.Select(c => new SelectListItem
                 {
                     Value = c.Id.ToString(),
-                    Text = c.Name
+                    Text = c.Name + " - " + c.Floor.Name + " - " + c.Address + " - " + c.District.Name
                 })              
             };
 

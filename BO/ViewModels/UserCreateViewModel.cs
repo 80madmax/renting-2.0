@@ -22,6 +22,7 @@ namespace BO.ViewModels
         public string Email { get; set; }
 
         [Display(Name = "Phone")]
+        [Required]
         public string Phone { get; set; }
 
         [Required]

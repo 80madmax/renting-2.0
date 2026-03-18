@@ -7,10 +7,12 @@ namespace BO.ViewModels.Reports
         public int? SelectedMonth { get; set; }
         public int? SelectedYear { get; set; }
         public int? SelectedUnitId { get; set; }
+        public int? SelectedTaxTypeId { get; set; }
 
         public IEnumerable<SelectListItem> Months { get; set; } = Enumerable.Empty<SelectListItem>();
         public IEnumerable<SelectListItem> Years { get; set; } = Enumerable.Empty<SelectListItem>();
         public IEnumerable<SelectListItem> Units { get; set; } = Enumerable.Empty<SelectListItem>();
+        public IEnumerable<SelectListItem> TaxTypes { get; set; } = Enumerable.Empty<SelectListItem>();
 
         public List<TaxesReportRowViewModel> Rows { get; set; } = new();
     }
@@ -19,6 +21,7 @@ namespace BO.ViewModels.Reports
     {
         public int Month { get; set; }
         public int Year { get; set; }
+        public string TaxTypeName { get; set; } = string.Empty;
         public decimal Total { get; set; }
     }
 }

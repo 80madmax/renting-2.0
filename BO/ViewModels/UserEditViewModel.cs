@@ -20,6 +20,7 @@ namespace BO.ViewModels
         public string Email { get; set; }
 
         [Display(Name = "Phone")]
+        [Required]
         public string Phone { get; set; }
 
         public string? Password { get; set; }
@@ -29,5 +30,7 @@ namespace BO.ViewModels
         public bool IsActive { get; set; }
 
         public IEnumerable<SelectListItem>? Roles { get; set; }
+
+        public bool IsSuperAdmin { get; set; }
     }
 }

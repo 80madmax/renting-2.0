@@ -9,10 +9,10 @@ namespace Core.Interfaces
 {
     public interface IDashboardRepository
     {
-        Task<IReadOnlyList<MonthlyProfit>> GetProfitPerMonth(int year);
-        Task<IReadOnlyList<YearlyProfit>> GetProfitPerYear();
-        Task<IReadOnlyList<UnitMonthlyBalance>> GetUnitMonthlyBalance(int month, int year);
-        Task<IReadOnlyList<UnitROI>> GetUnitsROI();
-        Task<PortfolioROI> GetPortfolioRoi();
+        Task<IReadOnlyList<MonthlyProfit>> GetProfitPerMonth(int year, int loggedUserId);
+        Task<IReadOnlyList<YearlyProfit>> GetProfitPerYear(int loggedUserId);
+        Task<IReadOnlyList<UnitMonthlyBalance>> GetUnitMonthlyBalance(int month, int year, int loggedUserId);
+        Task<IReadOnlyList<UnitROI>> GetUnitsROI(int loggedUserId);
+        Task<PortfolioROI> GetPortfolioRoi(int loggedUserId);
     }
 }

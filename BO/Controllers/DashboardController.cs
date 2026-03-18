@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BO.Controllers
 {
-    public class DashboardController : Controller
+    public class DashboardController : BaseController
     {
         private readonly IDashboardUseCase _dashboardUseCase;
 
@@ -17,15 +17,15 @@ namespace BO.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var profitPerMonth = await _dashboardUseCase.GetProfitPerMonthDashboard();
+            var profitPerMonth = await _dashboardUseCase.GetProfitPerMonthDashboard(LoggedUserIdAsInt);
 
-            var profitPerYear = await _dashboardUseCase.GetProfitPerYearDashboard();
+            var profitPerYear = await _dashboardUseCase.GetProfitPerYearDashboard(LoggedUserIdAsInt);
 
-            var unitsMonthlyBalances = await _dashboardUseCase.GetUnitsMonthlyBalanceDashboard();
+            var unitsMonthlyBalances = await _dashboardUseCase.GetUnitsMonthlyBalanceDashboard(LoggedUserIdAsInt);
 
-            var unitsROI = await _dashboardUseCase.GetUnitsROI();
+            var unitsROI = await _dashboardUseCase.GetUnitsROI(LoggedUserIdAsInt);
 
-            var portfolioRoi = await _dashboardUseCase.GetPortfolioRoiDashboard();
+            var portfolioRoi = await _dashboardUseCase.GetPortfolioRoiDashboard(LoggedUserIdAsInt);
 
             var vm = new DashboardViewModel
             {

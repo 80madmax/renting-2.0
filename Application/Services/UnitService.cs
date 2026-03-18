@@ -47,14 +47,14 @@ namespace Application.Services
             return await _unitRepository.GetPaginatedAsync(pageNumber, pageSize);
         }
 
-        public async Task<IPaginatedList<Unit>> GetPaginatedWithDistrictCityCountryFloorUnitTypeAsync(int pageNumber, int pageSize)
+        public async Task<IPaginatedList<Unit>> GetPaginatedWithDistrictCityCountryFloorUnitTypeAsync(int pageNumber, int pageSize, int loggedUserId)
         {
-            return await _unitRepository.GetPaginatedWithDistrictCityCountryFloorUnitTypeAsync(pageNumber, pageSize);
+            return await _unitRepository.GetPaginatedWithDistrictCityCountryFloorUnitTypeAsync(pageNumber, pageSize, loggedUserId);
         }
 
-        public async Task<List<Unit>> GetAllWithDistrictCityFloor()
+        public async Task<List<Unit>> GetAllWithDistrictCityFloor(int loggedUserId)
         {
-            return await _unitRepository.GetAllWithDistrictCityFloor();
+            return await _unitRepository.GetAllWithDistrictCityFloor(loggedUserId);
         }
 
 

@@ -67,7 +67,7 @@ namespace BO.ViewModels
         [Display(Name = "VAT Tax")]
         public decimal VatTax { get; set; } = 0;
 
-        public int UserId { get; set; } = 2;
+        public int UserId { get; set; } = 0;
 
         public IEnumerable<SelectListItem>? Countries { get; set; }
         public IEnumerable<SelectListItem>? Cities { get; set; }

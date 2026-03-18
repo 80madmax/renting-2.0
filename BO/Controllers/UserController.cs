@@ -8,8 +8,8 @@ using System.Numerics;
 
 namespace BO.Controllers
 {
-    [Authorize(Roles = "Super Admin")]
-    public class UserController : Controller
+    [Authorize]
+    public class UserController : BaseController
     {
         private readonly IUserService _userService;
         private readonly IRoleService _roleService;
@@ -21,6 +21,7 @@ namespace BO.Controllers
             _roleService = roleService;
         }
 
+        [Authorize(Roles = "Super Admin")]
         public async Task<IActionResult> Create()
         {
             var roles = _roleService.GetAll();
@@ -39,6 +40,7 @@ namespace BO.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Super Admin")]
         public async Task<IActionResult> Create(UserCreateViewModel model)
         {
             if (!ModelState.IsValid)
@@ -67,6 +69,7 @@ namespace BO.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Super Admin")]
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
         {
             var paginatedUsers = await _userService.GetPaginatedWithRolesAsync(pageNumber, pageSize);
@@ -91,6 +94,7 @@ namespace BO.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Super Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -108,6 +112,13 @@ namespace BO.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
+            var isSuperAdmin = User.IsInRole("Super Admin");
+
+            if (!isSuperAdmin && id != LoggedUserIdAsInt)
+            {
+                return Forbid();
+            }
+
             var user = await _userService.GetByIdAsync(id);
             if (user == null) return NotFound();
 
@@ -121,11 +132,21 @@ namespace BO.Controllers
                 IsActive = user.IsActive
             };
 
+            ViewBag.IsSuperAdmin = isSuperAdmin;
+
             return View(model);
         }
 
         public async Task<IActionResult> Edit(int id)
         {
+            var isSuperAdmin = User.IsInRole("Super Admin");
+
+            // Non-super-admins can only edit their own profile
+            if (!isSuperAdmin && id != LoggedUserIdAsInt)
+            {
+                return Forbid();
+            }
+
             var user = await _userService.GetByIdAsync(id);
             if (user == null) return NotFound();
 
@@ -143,7 +164,8 @@ namespace BO.Controllers
                 }),
                 Email = user.Email,
                 Phone = user.Phone,
-                IsActive = user.IsActive
+                IsActive = user.IsActive,
+                IsSuperAdmin = isSuperAdmin
             };
 
             return View(model);
@@ -152,6 +174,14 @@ namespace BO.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(UserEditViewModel model)
         {
+            var isSuperAdmin = User.IsInRole("Super Admin");
+
+            // Non-super-admins can only edit their own profile
+            if (!isSuperAdmin && model.Id != LoggedUserIdAsInt)
+            {
+                return Forbid();
+            }
+
             if (!ModelState.IsValid)
             {
                 var roles = _roleService.GetAll();
@@ -160,24 +190,36 @@ namespace BO.Controllers
                     Value = c.Id.ToString(),
                     Text = c.Name
                 });
+                model.IsSuperAdmin = isSuperAdmin;
 
                 return View(model);
             }
 
             var user = await _userService.GetByIdAsync(model.Id);
             user.Name = model.Name;
-            user.RoleId = model.RoleId;
             user.Phone = model.Phone;
             user.Email = model.Email;
-            user.IsActive = model.IsActive;
 
-            if(!string.IsNullOrWhiteSpace(model.Password)) 
+            // Only Super Admin can change role and active status
+            if (isSuperAdmin)
+            {
+                user.RoleId = model.RoleId;
+                user.IsActive = model.IsActive;
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.Password))
                 user.Password = model.Password;
 
             await _userService.UpdateAsync(user);
-            return RedirectToAction(nameof(Index));
-        }
 
-      
+            TempData["Success"] = "Profile updated successfully.";
+
+            if (isSuperAdmin)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            return RedirectToAction(nameof(Edit), new { id = model.Id });
+        }
     }
 }

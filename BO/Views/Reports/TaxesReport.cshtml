@@ -7,7 +7,7 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<!-- Filter form like Transaction/Index -->
+<!-- Filter form -->
 <form method="get" asp-action="TaxesReport" class="mb-4">
     <input type="hidden" name="isInitialLoad" value="false" />
 
@@ -15,6 +15,11 @@
         <div class="col-md-3">
             <label>Unit</label>
             <select asp-for="SelectedUnitId" asp-items="Model.Units" class="form-control">
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label>Tax Type</label>
+            <select asp-for="SelectedTaxTypeId" asp-items="Model.TaxTypes" class="form-control">
             </select>
         </div>
         <div class="col-md-2">
@@ -47,6 +52,7 @@ else
                 <tr>
                     <th>Month</th>
                     <th>Year</th>
+                    <th>Tax Type</th>
                     <th class="text-end">Total</th>
                 </tr>
             </thead>
@@ -56,14 +62,15 @@ else
                     <tr>
                         <td>@CultureInfo.GetCultureInfo("en-US").DateTimeFormat.GetMonthName(r.Month)</td>
                         <td>@r.Year</td>
-                        <td class="text-end">@r.Total.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                        <td>@r.TaxTypeName</td>
+                        <td class="text-end">@r.Total.ToString("N2", new CultureInfo("bg-BG"))</td>
                     </tr>
                 }
             </tbody>
             <tfoot>
                 <tr class="fw-bold">
-                    <td colspan="2" class="text-end">Grand Total:</td>
-                    <td class="text-end">@Model.Rows.Sum(x => x.Total).ToString("N2", new System.Globalization.CultureInfo("bg-BG"))</td>
+                    <td colspan="3" class="text-end">Grand Total:</td>
+                    <td class="text-end">@Model.Rows.Sum(x => x.Total).ToString("N2", new CultureInfo("bg-BG"))</td>
                 </tr>
             </tfoot>
         </table>

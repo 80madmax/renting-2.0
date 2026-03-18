@@ -27,9 +27,9 @@ namespace Infrastructure.Repositories
             return await _context.Units.Include(c => c.Floor).Include(c => c.UnitType).Include(c => c.District).ThenInclude(c => c.City).ThenInclude(c=>c.Country).FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task<List<Unit>> GetAllWithDistrictCityFloor()
+        public async Task<List<Unit>> GetAllWithDistrictCityFloor(int loggedUserId)
         {
-            return await _context.Units
+            return await _context.Units.Where(u => u.UserId == loggedUserId)
                                     .Include(u => u.District)
                                     .Include(u => u.District.City)
                                     .Include(u => u.Floor)
@@ -39,7 +39,7 @@ namespace Infrastructure.Repositories
                                     .ThenBy(u=>u.Floor).ToListAsync();
         }
 
-        public async Task<IPaginatedList<Unit>> GetPaginatedWithDistrictCityCountryFloorUnitTypeAsync(int pageNumber, int pageSize)
+        public async Task<IPaginatedList<Unit>> GetPaginatedWithDistrictCityCountryFloorUnitTypeAsync(int pageNumber, int pageSize, int loggedUserId)
         {
             var query = _dbSet.Include(c=>c.UnitType).Include(c=>c.Floor).Include(c => c.District).ThenInclude(c => c.City).ThenInclude(c => c.Country);
 

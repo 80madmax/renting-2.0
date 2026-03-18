@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "User Details";
+    bool isSuperAdmin = ViewBag.IsSuperAdmin ?? false;
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -29,19 +30,23 @@
 </div>
 
 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
-<button type="button"
-        class="btn btn-danger"
-        data-bs-toggle="modal"
-        data-bs-target="#deleteModal"
-        data-entity-id="@Model.Id"
-        data-entity-value="@Model.Name">
-    Delete
-</button>
-<a asp-action="Index" class="btn btn-secondary">Back to List</a>
-@await Html.PartialAsync("_DeleteModal", new DeleteModalViewModel
+@if (isSuperAdmin)
 {
-    EntityName = "User",
-    EntityValue = "", // placeholder; JS sets it dynamically
-    EntityId = 0,     // placeholder; JS sets it dynamically
-    ActionUrl = Url.Action("Delete", "User")
-})
+    <button type="button"
+            class="btn btn-danger"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteModal"
+            data-entity-id="@Model.Id"
+            data-entity-value="@Model.Name">
+        Delete
+    </button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+
+    @await Html.PartialAsync("_DeleteModal", new DeleteModalViewModel
+    {
+        EntityName = "User",
+        EntityValue = "",
+        EntityId = 0,
+        ActionUrl = Url.Action("Delete", "User")
+    })
+}

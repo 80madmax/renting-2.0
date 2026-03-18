@@ -1,4 +1,5 @@
-﻿using Application.UseCases;
+﻿using Application.Services;
+using Application.UseCases;
 using BO.ViewModels;
 using Core.Interfaces;
 using Core.Models;
@@ -8,7 +9,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace BO.Controllers
 {
-    public class UnitController : Controller
+    public class UnitController : BaseController
     {
         private readonly ICountryService _countryService;
         private readonly ICityService _cityService;
@@ -96,6 +97,20 @@ namespace BO.Controllers
                         Text = c.Name
                     });
                 }
+               
+                var floors = _floorService.GetAll();
+                model.Floors = floors.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                });
+
+                var unitTypes = _unitTypeService.GetAll();
+                model.UnitTypes = floors.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                });
 
                 return View(model);
             }
@@ -114,9 +129,10 @@ namespace BO.Controllers
                 RentPrice = model.RentPrice,
                 CorporateTax = model.CorporateTax,
                 VatTax = model.VatTax,
-                UserId = model.UserId
+                UserId = LoggedUserIdAsInt
             };
 
+            await _unitService.AddAsync(unit);
 
             return RedirectToAction(nameof(Index));
         }
@@ -151,7 +167,7 @@ namespace BO.Controllers
 
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10)
         {
-            var paginatedUnits = await _unitService.GetPaginatedWithDistrictCityCountryFloorUnitTypeAsync(pageNumber, pageSize);
+            var paginatedUnits = await _unitService.GetPaginatedWithDistrictCityCountryFloorUnitTypeAsync(pageNumber, pageSize, LoggedUserIdAsInt);
 
             var model = new UnitListViewModel
             {
@@ -306,6 +322,20 @@ namespace BO.Controllers
                     });
                 }
 
+                var floors = _floorService.GetAll();
+                model.Floors = floors.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                });
+
+                var unitTypes = _unitTypeService.GetAll();
+                model.UnitTypes = floors.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                });
+
                 return View(model);
             }
 
@@ -324,8 +354,10 @@ namespace BO.Controllers
                 RentPrice = model.RentPrice,
                 CorporateTax = model.CorporateTax,
                 VatTax = model.VatTax,
-                UserId = model.UserId
+                UserId = LoggedUserIdAsInt
             };
+
+            await _unitService.UpdateAsync(unit);
 
 
             return RedirectToAction(nameof(Index));

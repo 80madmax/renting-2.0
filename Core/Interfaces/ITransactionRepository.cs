@@ -12,8 +12,10 @@ namespace Core.Interfaces
     {
         Task<IPaginatedList<Transaction>> GetPaginatedWithFiltersAsync(TransactionFilter filter, int pageNumber, int pageSize);
 
-        Task<IEnumerable<Transaction>> GetFilteredTransactions(TransactionFilter filter);
+        Task<IEnumerable<Transaction>> GetFilteredTransactions(TransactionFilter filter, int loggedUserId);
 
         Task<Transaction> GetByIdWithDetails(int id);
+
+        Task<IPaginatedList<Transaction>> GetPaginatedWithFiltersAsync(TransactionFilter filter, int pageNumber, int pageSize, int loggedUserId);
     }
 }

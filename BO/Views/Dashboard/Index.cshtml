@@ -86,16 +86,16 @@
             <div class="text-end">
                 @{
                     var performanceClass = unitsTotalAmount >= unitsTotalRent ? "text-success" : "text-danger";
-                }
-
-                <div class="kpi-box">
-                    <div class="kpi-value @performanceClass">@unitsTotalAmount.ToString("N2")</div>
-                    <div class="kpi-label">Total amount</div>
-                </div>
+                }               
 
                 <div class="kpi-box">
                     <div class="kpi-value">@unitsTotalRent.ToString("N2")</div>
-                    <div class="kpi-label">Total rent</div>
+                    <div class="kpi-label">Total Net Rent</div>
+                </div>
+
+                <div class="kpi-box">
+                    <div class="kpi-value @performanceClass">@unitsTotalAmount.ToString("N2")</div>
+                    <div class="kpi-label">Monthly Balance</div>
                 </div>
             </div>
         </div>
@@ -111,8 +111,8 @@
                     <thead>
                         <tr>
                             <th>Apartment</th>
-                            <th class="text-end">Rent price</th>
-                            <th class="text-end">Balance</th>
+                            <th class="text-end">Net Rent</th>
+                            <th class="text-end">Monthly Balance</th>
                         </tr>
                     </thead>
                     <tbody>

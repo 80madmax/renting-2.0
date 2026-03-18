@@ -47,9 +47,40 @@ namespace Infrastructure.Repositories
             return await PaginationHelper.ToPaginatedListAsync(query, pageNumber, pageSize);
         }
 
-        public async Task<IEnumerable<Transaction>> GetFilteredTransactions(TransactionFilter filter)
+        public async Task<IPaginatedList<Transaction>> GetPaginatedWithFiltersAsync(TransactionFilter filter, int pageNumber, int pageSize, int loggedUserId)
         {
-            var query = _context.Transactions.Include(t => t.Unit).Include(t => t.Payment).Include(t => t.Payment.PaymentType).AsQueryable();
+            IQueryable<Transaction> query = _context.Transactions
+                                             .Include(t => t.Unit)
+                                             .Include(t => t.Unit.District)
+                                             .Include(t => t.Unit.Floor)
+                                             .Include(t => t.Payment)
+                                             .Include(t => t.Payment.PaymentType)
+                                             .Where(t => t.Unit.UserId == loggedUserId);
+
+            if (filter.UnitId.HasValue)
+                query = query.Where(q => q.UnitId == filter.UnitId.Value);
+
+            if (filter.PaymentId.HasValue)
+                query = query.Where(q => q.PaymentId == filter.PaymentId.Value);
+
+            if (filter.MonthId.HasValue)
+                query = query.Where(q => q.Month == filter.MonthId.Value);
+
+            if (filter.YearId.HasValue)
+                query = query.Where(q => q.Year == filter.YearId.Value);
+
+            query = query.OrderByDescending(q => q.Year).ThenByDescending(q => q.Month).ThenBy(q => q.Unit.Name);
+
+            return await PaginationHelper.ToPaginatedListAsync(query, pageNumber, pageSize);
+        }
+
+        public async Task<IEnumerable<Transaction>> GetFilteredTransactions(TransactionFilter filter, int loggedUserId)
+        {
+            var query = _context.Transactions
+                                .Include(t => t.Unit)
+                                .Include(t => t.Payment)
+                                .Include(t => t.Payment.PaymentType)
+                                .Where(t => t.Unit.UserId == loggedUserId);                              
 
             if (filter.UnitId.HasValue)
                 query = query.Where(q => q.UnitId == filter.UnitId.Value);

@@ -10,10 +10,10 @@ namespace Application.UseCases
 {
     public interface IDashboardUseCase
     {
-        Task<ProfitPerMonthDashboardDTO> GetProfitPerMonthDashboard();
-        Task<ProfitPerYearDashboardDTO> GetProfitPerYearDashboard();
-        Task<UnitMonthlyBalanceDTO> GetUnitsMonthlyBalanceDashboard();
-        Task<UnitsROIDTO> GetUnitsROI();
-        Task<PortfolioROIDTO> GetPortfolioRoiDashboard();
+        Task<ProfitPerMonthDashboardDTO> GetProfitPerMonthDashboard(int loggedUserId);
+        Task<ProfitPerYearDashboardDTO> GetProfitPerYearDashboard(int loggedUserId);
+        Task<UnitMonthlyBalanceDTO> GetUnitsMonthlyBalanceDashboard(int loggedUserId);
+        Task<UnitsROIDTO> GetUnitsROI(int loggedUserId);
+        Task<PortfolioROIDTO> GetPortfolioRoiDashboard(int loggedUserId);
     }
 }

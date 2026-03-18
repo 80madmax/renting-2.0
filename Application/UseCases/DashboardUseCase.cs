@@ -18,11 +18,11 @@ namespace Application.UseCases
             _dashboardRepository = dashboardRepository;
         }
 
-        public async Task<ProfitPerMonthDashboardDTO> GetProfitPerMonthDashboard()
+        public async Task<ProfitPerMonthDashboardDTO> GetProfitPerMonthDashboard(int loggedUserId)
         {
             var year = DateTime.Now.Year;
 
-            var rows = await _dashboardRepository.GetProfitPerMonth(year);
+            var rows = await _dashboardRepository.GetProfitPerMonth(year, loggedUserId);
 
             var map = rows.ToDictionary(x => x.Month, x => x.Profit);
 
@@ -41,9 +41,9 @@ namespace Application.UseCases
 
         }
 
-        public async Task<ProfitPerYearDashboardDTO> GetProfitPerYearDashboard()
+        public async Task<ProfitPerYearDashboardDTO> GetProfitPerYearDashboard(int loggedUserId)
         {        
-            var yearlyProfits = await _dashboardRepository.GetProfitPerYear();
+            var yearlyProfits = await _dashboardRepository.GetProfitPerYear(loggedUserId);
 
             return new ProfitPerYearDashboardDTO
             {                
@@ -52,12 +52,12 @@ namespace Application.UseCases
 
         }
 
-        public async Task<UnitMonthlyBalanceDTO> GetUnitsMonthlyBalanceDashboard()
+        public async Task<UnitMonthlyBalanceDTO> GetUnitsMonthlyBalanceDashboard(int loggedUserId)
         {
             var year = DateTime.Now.Year;
             var month = DateTime.Now.Month;
 
-            var unitsMonthlyBalances = await _dashboardRepository.GetUnitMonthlyBalance(month, year);
+            var unitsMonthlyBalances = await _dashboardRepository.GetUnitMonthlyBalance(month, year, loggedUserId);
 
             return new UnitMonthlyBalanceDTO
             {
@@ -65,9 +65,9 @@ namespace Application.UseCases
             };
         }
 
-        public async Task<UnitsROIDTO> GetUnitsROI()
+        public async Task<UnitsROIDTO> GetUnitsROI(int loggedUserId)
         {
-            var items = await _dashboardRepository.GetUnitsROI();
+            var items = await _dashboardRepository.GetUnitsROI(loggedUserId);
 
             return new UnitsROIDTO
             {
@@ -75,9 +75,9 @@ namespace Application.UseCases
             };
         }
 
-        public async Task<PortfolioROIDTO> GetPortfolioRoiDashboard()
+        public async Task<PortfolioROIDTO> GetPortfolioRoiDashboard(int loggedUserId)
         {
-            var data = await _dashboardRepository.GetPortfolioRoi();
+            var data = await _dashboardRepository.GetPortfolioRoi(loggedUserId);
 
             return new PortfolioROIDTO
             {
