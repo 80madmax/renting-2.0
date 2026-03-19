@@ -219,14 +219,15 @@ namespace BO.Controllers
                 FloorName = unit.Floor.Name,
                 UnitTypeName = unit.UnitType.Name,
                 Address = unit.Address,
-                DistrictName=unit.District?.Name ?? string.Empty,
+                DistrictName = unit.District?.Name ?? string.Empty,
                 CityName = unit.District?.City.Name ?? string.Empty,
                 CountryName = unit.District?.City.Country.Name ?? string.Empty,
                 Cost = unit.Cost,
-                RentPrice = unit.RentPrice,  
+                RentPrice = unit.RentPrice,
                 CorporateTax = unit.CorporateTax,
                 VatTax = unit.VatTax,
                 Chat = unit.TelegramChatId,
+                Note = unit.Note,
                 IsAvailable = unit.IsAvailable
             };
 
@@ -284,6 +285,7 @@ namespace BO.Controllers
                 CorporateTax = unit.CorporateTax,
                 VatTax = unit.VatTax,
                 Chat = unit.TelegramChatId,
+                Note = unit.Note,
                 IsAvailable = unit.IsAvailable
             };
 
