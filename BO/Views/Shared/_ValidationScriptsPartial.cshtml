@@ -1,2 +1,12 @@
 ﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script>
+    // Accept both comma and dot as decimal separator
+    $.validator.methods.number = function (value, element) {
+        return this.optional(element) || /^-?(?:\d+)(?:[.,]\d+)?$/.test(value);
+    };
+    $.validator.methods.range = function (value, element, param) {
+        var val = parseFloat(value.replace(',', '.'));
+        return this.optional(element) || (val >= param[0] && val <= param[1]);
+    };
+</script>

@@ -1,18 +1,23 @@
 using Application.Services;
 using Application.UseCases;
-//using System.Globalization;
-//using Microsoft.AspNetCore.Localization;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using BO.ModelBinders;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    // Insert at position 0 so it takes priority over the default decimal binder
+    options.ModelBinderProviders.Insert(0, new DecimalModelBinderProvider());
+});
 
 // Authentication / Authorization
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -84,6 +89,15 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Localization — must be before Authentication/Authorization
+var supportedCultures = new[] { new CultureInfo("bg-BG") };
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("bg-BG"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
+
 // Authentication must come before Authorization
 app.UseAuthentication();
 app.UseAuthorization();
@@ -91,16 +105,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboard}/{action=Index}/{id?}");
-/*
-var supportedCultures = new[] { new CultureInfo("bg-BG") }; // or "de-DE", etc.
 
-var localizationOptions = new RequestLocalizationOptions
-{
-    DefaultRequestCulture = new RequestCulture("bg-BG"), // must match culture above
-    SupportedCultures = supportedCultures,
-    SupportedUICultures = supportedCultures
-};
-
-app.UseRequestLocalization(localizationOptions);
-*/
 app.Run();
