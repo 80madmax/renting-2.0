@@ -21,7 +21,7 @@ namespace Core.Models
         [ValidateNever]
         public UnitType UnitType { get; set; }
         
-        public string Note { get; set; }
+        public string? Note { get; set; }
 
         public bool IsAvailable { get; set; }
 

@@ -47,7 +47,8 @@ namespace BO.ViewModels
         [Display(Name = "Country")]
         public string? CountryName { get; set; }
 
-        public string Note { get; set; } = "";
+        [Display(Name = "Note")]
+        public string? Note { get; set; }
 
         [Display(Name = "Is Available")]
         public bool IsAvailable { get; set; } = true;
