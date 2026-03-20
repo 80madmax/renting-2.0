@@ -61,25 +61,25 @@
 
     <div class="form-group">
         <label asp-for="Cost"></label>
-        <input name="Cost" class="form-control" value="@Model.Cost.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))" />
+        <input asp-for="Cost" class="form-control" value="@Model.Cost.ToString("F2").Replace('.', ',')" />
         <span asp-validation-for="Cost" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="RentPrice"></label>
-        <input name="RentPrice" class="form-control" value="@Model.RentPrice.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))" />
+        <input asp-for="RentPrice" class="form-control" value="@Model.RentPrice.ToString("F2").Replace('.', ',')" />
         <span asp-validation-for="RentPrice" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="CorporateTax"></label>
-        <input name="CorporateTax" class="form-control" value="@Model.CorporateTax.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))" />
+        <input asp-for="CorporateTax" class="form-control" value="@Model.CorporateTax.ToString("F2").Replace('.', ',')" />
         <span asp-validation-for="CorporateTax" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="VatTax"></label>
-        <input name="VatTax" class="form-control" value="@Model.VatTax.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))" />
+        <input asp-for="VatTax" class="form-control" value="@Model.VatTax.ToString("F2").Replace('.', ',')" />
         <span asp-validation-for="VatTax" class="text-danger"></span>
     </div>
 

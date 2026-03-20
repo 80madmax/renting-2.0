@@ -38,7 +38,7 @@
 
     <div class="form-group">
         <label asp-for="Amount"></label>
-        <input name="Amount" class="form-control" value="@Model.Amount.ToString("N2", new System.Globalization.CultureInfo("bg-BG"))" />
+        <input asp-for="Amount" class="form-control" value="@Model.Amount.ToString("F2").Replace('.', ',')" />
         <span asp-validation-for="Amount" class="text-danger"></span>
     </div>
 
@@ -51,7 +51,6 @@
         <button type="submit" class="btn btn-primary">Create</button>
         <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 
-        <!-- Taxes toggle button placed next to other action buttons -->
         <button type="button" id="toggleTaxesBtn" class="btn btn-info" aria-expanded="false" aria-controls="taxesPanel">
             Show Taxes
         </button>
@@ -101,7 +100,7 @@
 
                 if (!taxesLoaded) {
                     $.ajax({
-                        url: '@Url.Action("GetUnitTaxesReminder", "Transaction")', // controller method (fake/demo endpoint)
+                        url: '@Url.Action("GetUnitTaxesReminder", "Transaction")',
                         type: 'GET',
                         success: function (response) {
                             $('#taxesPanelContent').html(response);
